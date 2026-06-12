@@ -8,3 +8,6 @@ export * from "./products/types";
 
 export * from "./images";
 export * from "./images/types";
+
+export * from "./orders";
+export * from "./orders/types";

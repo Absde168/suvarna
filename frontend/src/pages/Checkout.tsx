@@ -7,7 +7,9 @@ import { useState } from 'react';
 import { Link } from 'wouter';
 import { Check, ChevronRight } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
-import { formatPrice } from '@/lib/products';
+import { formatPrice } from '@/lib/utils';
+import { getImageUrl } from '@shared/api';
+import { useCreateOrder } from '@/entities/orders';
 import { toast } from 'sonner';
 
 type Step = 'contacts' | 'delivery' | 'payment' | 'success';
@@ -38,6 +40,7 @@ const STEPS: { key: Step; label: string }[] = [
 
 export default function Checkout() {
   const { items, totalPrice, clearCart } = useCart();
+  const createOrder = useCreateOrder();
   const [step, setStep] = useState<Step>('contacts');
   const [form, setForm] = useState<FormData>({
     firstName: '', lastName: '', phone: '', email: '',
@@ -69,8 +72,34 @@ export default function Checkout() {
         toast.error('Необходимо согласиться с условиями');
         return;
       }
-      setStep('success');
-      clearCart();
+      createOrder.mutate(
+        {
+          firstName: form.firstName,
+          lastName: form.lastName,
+          phone: form.phone,
+          email: form.email,
+          deliveryMethod: form.deliveryMethod,
+          city: form.city || undefined,
+          address: form.address || undefined,
+          apartment: form.apartment || undefined,
+          comment: form.comment || undefined,
+          paymentMethod: form.paymentMethod,
+          items: items.map(item => ({
+            productId: item.product.id,
+            size: item.size,
+            quantity: item.quantity,
+          })),
+        },
+        {
+          onSuccess: () => {
+            setStep('success');
+            clearCart();
+          },
+          onError: () => {
+            toast.error('Не удалось оформить заказ. Попробуйте ещё раз.');
+          },
+        }
+      );
     }
   };
 
@@ -347,8 +376,8 @@ export default function Checkout() {
                   <span className="btn-outline">Продолжить покупки</span>
                 </Link>
               )}
-              <button onClick={handleNext} className="btn-primary flex items-center gap-2">
-                {step === 'payment' ? 'Оформить заказ' : 'Далее'}
+              <button onClick={handleNext} disabled={createOrder.isPending} className="btn-primary flex items-center gap-2">
+                {step === 'payment' ? (createOrder.isPending ? 'Оформляем...' : 'Оформить заказ') : 'Далее'}
                 <ChevronRight size={14} />
               </button>
             </div>
@@ -364,11 +393,13 @@ export default function Checkout() {
                 {items.map(item => (
                   <div key={`${item.product.id}-${item.size}`} className="flex gap-3">
                     <div className="w-14 h-18 flex-shrink-0 overflow-hidden bg-card-sienna">
-                      <img
-                        src={item.product.images[0]}
-                        alt={item.product.name}
-                        className="w-full h-full object-cover"
-                      />
+                      {item.product.images[0] && (
+                        <img
+                          src={getImageUrl({ id: item.product.images[0].id })}
+                          alt={item.product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-body text-xs font-500 text-cream leading-tight mb-0.5">

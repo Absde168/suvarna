@@ -5,7 +5,8 @@
  * - Cream text, cream badges
  */
 import { Link } from 'wouter';
-import { Product, formatPrice } from '@/lib/products';
+import { getImageUrl, type Product } from '@shared/api';
+import { formatPrice } from '@/lib/utils';
 
 interface ProductCardProps {
   product: Product;
@@ -21,12 +22,14 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
       >
         {/* Image */}
         <div className="product-card-img relative overflow-hidden aspect-[3/4]" style={{ backgroundColor: 'rgba(0,0,0,0.14)' }}>
-          <img
-            src={product.images[0]}
-            alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-            loading="lazy"
-          />
+          {product.images[0] && (
+            <img
+              src={getImageUrl({ id: product.images[0].id })}
+              alt={product.name}
+              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+              loading="lazy"
+            />
+          )}
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">
             {product.isNew && (
@@ -45,7 +48,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
           {/* Hover second image */}
           {product.images[1] && (
             <img
-              src={product.images[1]}
+              src={getImageUrl({ id: product.images[1].id })}
               alt={product.name}
               className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
               loading="lazy"
@@ -55,7 +58,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
 
         {/* Info */}
         <div className="pt-3 pb-1">
-          <p className="section-label mb-1">{product.category}</p>
+          <p className="section-label mb-1">{product.category?.name}</p>
           <h3 className="font-body text-sm font-400 leading-tight mb-1.5 group-hover:opacity-70 transition-opacity"
             style={{ color: '#FFFDF7' }}>
             {product.name}

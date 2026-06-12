@@ -6,7 +6,8 @@
  */
 import { X, Minus, Plus, Trash2 } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
-import { formatPrice } from '@/lib/products';
+import { formatPrice } from '@/lib/utils';
+import { getImageUrl } from '@shared/api';
 import { Link } from 'wouter';
 
 export default function CartSidebar() {
@@ -58,11 +59,13 @@ export default function CartSidebar() {
               {items.map(item => (
                 <div key={`${item.product.id}-${item.size}`} className="flex gap-4">
                   <div className="w-20 h-24 flex-shrink-0 overflow-hidden" style={{ backgroundColor: 'rgba(0,0,0,0.15)' }}>
-                    <img
-                      src={item.product.images[0]}
-                      alt={item.product.name}
-                      className="w-full h-full object-cover"
-                    />
+                    {item.product.images[0] && (
+                      <img
+                        src={getImageUrl({ id: item.product.images[0].id })}
+                        alt={item.product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-body text-sm font-500 leading-tight mb-1" style={{ color: '#FFFDF7' }}>

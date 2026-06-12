@@ -3,17 +3,18 @@
  */
 import { useState } from 'react';
 import { Search as SearchIcon } from 'lucide-react';
-import { PRODUCTS } from '@/lib/products';
+import { useProducts } from '@/entities/products';
 import ProductCard from '@/components/ProductCard';
 
 export default function Search() {
   const [query, setQuery] = useState('');
+  const { data: products } = useProducts();
 
   const results = query.length >= 2
-    ? PRODUCTS.filter(p =>
+    ? (products ?? []).filter(p =>
         p.name.toLowerCase().includes(query.toLowerCase()) ||
-        p.category.toLowerCase().includes(query.toLowerCase()) ||
-        p.description.toLowerCase().includes(query.toLowerCase())
+        (p.category?.name ?? '').toLowerCase().includes(query.toLowerCase()) ||
+        (p.description ?? '').toLowerCase().includes(query.toLowerCase())
       )
     : [];
 

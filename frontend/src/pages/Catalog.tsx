@@ -8,8 +8,9 @@
 import { useState, useEffect } from 'react';
 import { useSearch } from 'wouter';
 import ProductCard from '@/components/ProductCard';
-import { PRODUCTS, CATEGORIES, getProductsByCategory } from '@/lib/products';
-import { SlidersHorizontal, X } from 'lucide-react';
+import { useProducts } from '@/entities/products';
+import { useCategories } from '@/entities/categories';
+import { X } from 'lucide-react';
 
 export default function Catalog() {
   const search = useSearch();
@@ -26,7 +27,12 @@ export default function Catalog() {
     setActiveFilter(params.get('filter') || '');
   }, [search]);
 
-  let products = getProductsByCategory(activeCategory);
+  const { data: categoriesData } = useCategories();
+  const { data: productsData } = useProducts(
+    activeCategory !== 'all' ? { category: activeCategory } : {}
+  );
+
+  let products = productsData ?? [];
 
   if (activeFilter === 'new') {
     products = products.filter(p => p.isNew);
@@ -34,7 +40,9 @@ export default function Catalog() {
     products = products.filter(p => p.isBestseller);
   }
 
-  const categoryName = CATEGORIES.find(c => c.slug === activeCategory)?.name || 'Все';
+  const categories = [{ id: 0, name: 'Все', slug: 'all', count: 0 }, ...(categoriesData ?? [])];
+
+  const categoryName = categories.find(c => c.slug === activeCategory)?.name || 'Все';
 
   return (
     <main className="pt-20 lg:pt-24 min-h-screen">
@@ -53,7 +61,7 @@ export default function Catalog() {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 mb-8">
         {/* Category Tabs */}
         <div className="flex items-center gap-1 overflow-x-auto pb-2 scrollbar-hide">
-          {CATEGORIES.map(cat => (
+          {categories.map(cat => (
             <button
               key={cat.slug}
               onClick={() => { setActiveCategory(cat.slug); setActiveFilter(''); }}

@@ -9,20 +9,31 @@
  */
 import { useState } from 'react';
 import { useParams, Link } from 'wouter';
-import { ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
-import { getProductById, getRelatedProducts, formatPrice } from '@/lib/products';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { getImageUrl } from '@shared/api';
+import { formatPrice } from '@/lib/utils';
+import { useProduct, useProducts } from '@/entities/products';
 import { useCart } from '@/contexts/CartContext';
 import ProductCard from '@/components/ProductCard';
 import { toast } from 'sonner';
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
-  const product = getProductById(id || '');
+  const productId = Number(id);
+  const { data: product, isLoading } = useProduct({ id: productId });
   const { addItem } = useCart();
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState('');
   const [openAccordion, setOpenAccordion] = useState<string | null>('description');
+
+  const { data: categoryProducts } = useProducts(
+    product?.category?.slug ? { category: product.category.slug } : {}
+  );
+
+  if (isLoading) {
+    return <main className="pt-24 min-h-screen" />;
+  }
 
   if (!product) {
     return (
@@ -37,7 +48,7 @@ export default function ProductDetail() {
     );
   }
 
-  const related = getRelatedProducts(product, 4);
+  const related = (categoryProducts ?? []).filter(p => p.id !== product.id).slice(0, 4);
 
   const handleAddToCart = () => {
     if (!selectedSize) {
@@ -80,8 +91,8 @@ export default function ProductDetail() {
           <span>/</span>
           <Link href="/catalog"><span className="hover:opacity-100 transition-opacity">Каталог</span></Link>
           <span>/</span>
-          <Link href={`/catalog?category=${product.categorySlug}`}>
-            <span className="hover:opacity-100 transition-opacity">{product.category}</span>
+          <Link href={`/catalog?category=${product.category?.slug ?? ''}`}>
+            <span className="hover:opacity-100 transition-opacity">{product.category?.name}</span>
           </Link>
           <span>/</span>
           <span style={{ color: '#FFFDF7' }}>{product.name}</span>
@@ -97,23 +108,25 @@ export default function ProductDetail() {
             <div className="flex flex-col gap-2 w-16 flex-shrink-0">
               {product.images.map((img, i) => (
                 <button
-                  key={i}
+                  key={img.id}
                   onClick={() => setSelectedImage(i)}
                   className={`aspect-[3/4] overflow-hidden border transition-all duration-200 ${
                     selectedImage === i ? 'border-[#111111]' : 'border-transparent opacity-60 hover:opacity-100'
                   }`}
                 >
-                  <img src={img} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
+                  <img src={getImageUrl({ id: img.id })} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
             {/* Main Image */}
             <div className="flex-1 aspect-[3/4] overflow-hidden" style={{ backgroundColor: 'rgba(0,0,0,0.15)' }}>
-              <img
-                src={product.images[selectedImage]}
-                alt={product.name}
-                className="w-full h-full object-cover transition-opacity duration-300"
-              />
+              {product.images[selectedImage] && (
+                <img
+                  src={getImageUrl({ id: product.images[selectedImage].id })}
+                  alt={product.name}
+                  className="w-full h-full object-cover transition-opacity duration-300"
+                />
+              )}
             </div>
           </div>
 
@@ -133,7 +146,7 @@ export default function ProductDetail() {
               )}
             </div>
 
-            <p className="section-label mb-2">{product.category}</p>
+            <p className="section-label mb-2">{product.category?.name}</p>
             <h1 className="font-display text-3xl lg:text-4xl font-light mb-3 leading-tight" style={{ color: '#FFFDF7' }}>
               {product.name}
             </h1>

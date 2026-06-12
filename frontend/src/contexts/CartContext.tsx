@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Product } from '@/lib/products';
+import type { Product } from '@shared/api';
 
 export interface CartItem {
   product: Product;
@@ -10,8 +10,8 @@ export interface CartItem {
 interface CartContextType {
   items: CartItem[];
   addItem: (product: Product, size: string, quantity?: number) => void;
-  removeItem: (productId: string, size: string) => void;
-  updateQuantity: (productId: string, size: string, quantity: number) => void;
+  removeItem: (productId: number, size: string) => void;
+  updateQuantity: (productId: number, size: string, quantity: number) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
@@ -41,11 +41,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setIsOpen(true);
   }, []);
 
-  const removeItem = useCallback((productId: string, size: string) => {
+  const removeItem = useCallback((productId: number, size: string) => {
     setItems(prev => prev.filter(i => !(i.product.id === productId && i.size === size)));
   }, []);
 
-  const updateQuantity = useCallback((productId: string, size: string, quantity: number) => {
+  const updateQuantity = useCallback((productId: number, size: string, quantity: number) => {
     if (quantity <= 0) {
       removeItem(productId, size);
       return;

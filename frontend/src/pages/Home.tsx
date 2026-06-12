@@ -13,7 +13,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'wouter';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
-import { PRODUCTS } from '@/lib/products';
+import { useProducts } from '@/entities/products';
 
 const HERO_SLIDES = [
   {
@@ -125,8 +125,10 @@ export default function Home() {
     return () => clearInterval(timer);
   }, [nextSlide]);
 
-  const bestsellers = PRODUCTS.filter(p => p.isBestseller).slice(0, 4);
-  const newArrivals = PRODUCTS.filter(p => p.isNew).slice(0, 4);
+  const { data: products } = useProducts();
+
+  const bestsellers = (products ?? []).filter(p => p.isBestseller).slice(0, 4);
+  const newArrivals = (products ?? []).filter(p => p.isNew).slice(0, 4);
 
   const slide = HERO_SLIDES[currentSlide];
 

@@ -1,0 +1,405 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* 
+ * SUVARNA — Design System v2
+ * Style: Warm Botanical Terracotta
+ * 
+ * Color Philosophy:
+ *   Background: Sienna #C17A5A — fixed, warm, earthy
+ *   Pattern: botanical (branches, flowers, leaves, berries) white lines 13% opacity
+ *   Text: cream #FFFDF7 — all text forced with !important
+ *   Secondary text: rgba(255,253,247,0.85)
+ *   Sections: dark glass rgba(0,0,0,0.12)
+ *   Cards: slightly darker than background
+ * 
+ * Typography:
+ *   Display/Headings: Cormorant Garamond (serif, elegant)
+ *   Body/UI: Raleway (300/400/500, sans-serif)
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* Sienna palette — oklch approximation of #C17A5A */
+:root {
+  --sienna: #C17A5A;
+  --sienna-dark: #A8623F;
+  --sienna-card: rgba(0,0,0,0.14);
+  --sienna-glass: rgba(0,0,0,0.12);
+  --cream: #FFFDF7;
+  --cream-muted: rgba(255,253,247,0.85);
+  --cream-faint: rgba(255,253,247,0.55);
+  --cream-border: rgba(255,253,247,0.22);
+
+  --radius: 0;
+  /* oklch for #C17A5A */
+  --background: oklch(0.60 0.09 42);
+  --foreground: oklch(0.99 0.005 88);
+  --card: oklch(0.52 0.09 42);
+  --card-foreground: oklch(0.99 0.005 88);
+  --popover: oklch(0.55 0.09 42);
+  --popover-foreground: oklch(0.99 0.005 88);
+  --primary: oklch(0.99 0.005 88);
+  --primary-foreground: oklch(0.60 0.09 42);
+  --secondary: oklch(0.52 0.09 42);
+  --secondary-foreground: oklch(0.99 0.005 88);
+  --muted: oklch(0.52 0.09 42);
+  --muted-foreground: oklch(0.90 0.005 88);
+  --accent: oklch(0.52 0.09 42);
+  --accent-foreground: oklch(0.99 0.005 88);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.99 0.005 88 / 22%);
+  --input: oklch(0.99 0.005 88 / 22%);
+  --ring: oklch(0.99 0.005 88 / 50%);
+  --chart-1: oklch(0.90 0.04 65);
+  --chart-2: oklch(0.80 0.06 50);
+  --chart-3: oklch(0.70 0.08 40);
+  --chart-4: oklch(0.60 0.10 35);
+  --chart-5: oklch(0.50 0.08 30);
+  --sidebar: oklch(0.55 0.09 42);
+  --sidebar-foreground: oklch(0.99 0.005 88);
+  --sidebar-primary: oklch(0.99 0.005 88);
+  --sidebar-primary-foreground: oklch(0.60 0.09 42);
+  --sidebar-accent: oklch(0.52 0.09 42);
+  --sidebar-accent-foreground: oklch(0.99 0.005 88);
+  --sidebar-border: oklch(0.99 0.005 88 / 22%);
+  --sidebar-ring: oklch(0.99 0.005 88 / 50%);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  /* Fixed Sienna background with botanical SVG pattern */
+  html, body {
+    background-color: #C17A5A !important;
+  }
+
+  html {
+    /* botanical pattern handled via body::before */
+  }
+
+  body {
+    background-color: #C17A5A !important;
+    color: #FFFDF7 !important;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Botanical pattern overlay — fixed pseudo-element, white lines 13% opacity */
+  /* Using a separate div injected via React instead for better z-index control */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='700' viewBox='0 0 700 700'%3E%3Cg fill='none' stroke='white' stroke-width='1' opacity='0.13'%3E%3C!-- Main sweeping branch 1 --%3E%3Cpath d='M30 680 C100 560 180 460 260 370 C340 280 430 200 540 110 C580 80 620 55 660 30'/%3E%3C!-- Branch 2 parallel --%3E%3Cpath d='M0 520 C70 420 150 330 240 250 C320 175 420 105 510 50'/%3E%3C!-- Branch 3 lower --%3E%3Cpath d='M80 700 C160 590 240 490 330 400 C410 315 500 235 600 155 C630 132 660 112 690 90'/%3E%3C!-- Side twigs left --%3E%3Cpath d='M110 590 C80 555 50 535 20 525'/%3E%3Cpath d='M150 540 C115 510 85 488 55 475'/%3E%3Cpath d='M195 490 C160 462 130 440 100 428'/%3E%3Cpath d='M240 440 C205 412 175 390 148 376'/%3E%3Cpath d='M285 395 C252 368 222 346 196 332'/%3E%3C!-- Side twigs right --%3E%3Cpath d='M340 330 C375 305 405 285 430 272'/%3E%3Cpath d='M385 285 C420 260 450 242 478 230'/%3E%3Cpath d='M430 242 C465 218 495 200 522 188'/%3E%3Cpath d='M475 200 C508 176 538 158 564 146'/%3E%3Cpath d='M520 160 C552 136 580 118 604 106'/%3E%3C!-- Leaves on left twigs --%3E%3Cellipse cx='18' cy='522' rx='14' ry='6' transform='rotate(-25 18 522)'/%3E%3Cellipse cx='52' cy='472' rx='13' ry='5.5' transform='rotate(-35 52 472)'/%3E%3Cellipse cx='96' cy='425' rx='13' ry='5.5' transform='rotate(-40 96 425)'/%3E%3Cellipse cx='143' cy='373' rx='12' ry='5' transform='rotate(-38 143 373)'/%3E%3Cellipse cx='192' cy='328' rx='12' ry='5' transform='rotate(-33 192 328)'/%3E%3C!-- Leaves on right twigs --%3E%3Cellipse cx='432' cy='268' rx='13' ry='5.5' transform='rotate(22 432 268)'/%3E%3Cellipse cx='480' cy='226' rx='12' ry='5' transform='rotate(28 480 226)'/%3E%3Cellipse cx='524' cy='184' rx='12' ry='5' transform='rotate(32 524 184)'/%3E%3Cellipse cx='566' cy='142' rx='11' ry='4.5' transform='rotate(36 566 142)'/%3E%3Cellipse cx='606' cy='102' rx='10' ry='4' transform='rotate(40 606 102)'/%3E%3C!-- Flowers with petals on main branch --%3E%3C!-- Flower 1 --%3E%3Ccircle cx='210' cy='370' r='9'/%3E%3Ccircle cx='210' cy='370' r='4'/%3E%3Cellipse cx='210' cy='358' rx='5' ry='8' transform='rotate(0 210 358)'/%3E%3Cellipse cx='221' cy='362' rx='5' ry='8' transform='rotate(60 221 362)'/%3E%3Cellipse cx='221' cy='378' rx='5' ry='8' transform='rotate(120 221 378)'/%3E%3Cellipse cx='210' cy='382' rx='5' ry='8' transform='rotate(180 210 382)'/%3E%3Cellipse cx='199' cy='378' rx='5' ry='8' transform='rotate(240 199 378)'/%3E%3Cellipse cx='199' cy='362' rx='5' ry='8' transform='rotate(300 199 362)'/%3E%3C!-- Flower 2 --%3E%3Ccircle cx='340' cy='255' r='8'/%3E%3Ccircle cx='340' cy='255' r='3.5'/%3E%3Cellipse cx='340' cy='244' rx='4.5' ry='7' transform='rotate(0 340 244)'/%3E%3Cellipse cx='350' cy='248' rx='4.5' ry='7' transform='rotate(60 350 248)'/%3E%3Cellipse cx='350' cy='262' rx='4.5' ry='7' transform='rotate(120 350 262)'/%3E%3Cellipse cx='340' cy='266' rx='4.5' ry='7' transform='rotate(180 340 266)'/%3E%3Cellipse cx='330' cy='262' rx='4.5' ry='7' transform='rotate(240 330 262)'/%3E%3Cellipse cx='330' cy='248' rx='4.5' ry='7' transform='rotate(300 330 248)'/%3E%3C!-- Flower 3 --%3E%3Ccircle cx='460' cy='165' r='7'/%3E%3Ccircle cx='460' cy='165' r='3'/%3E%3Cellipse cx='460' cy='155' rx='4' ry='6.5' transform='rotate(0 460 155)'/%3E%3Cellipse cx='469' cy='159' rx='4' ry='6.5' transform='rotate(60 469 159)'/%3E%3Cellipse cx='469' cy='171' rx='4' ry='6.5' transform='rotate(120 469 171)'/%3E%3Cellipse cx='460' cy='175' rx='4' ry='6.5' transform='rotate(180 460 175)'/%3E%3Cellipse cx='451' cy='171' rx='4' ry='6.5' transform='rotate(240 451 171)'/%3E%3Cellipse cx='451' cy='159' rx='4' ry='6.5' transform='rotate(300 451 159)'/%3E%3C!-- Flower 4 small --%3E%3Ccircle cx='570' cy='90' r='6'/%3E%3Ccircle cx='570' cy='90' r='2.5'/%3E%3Cellipse cx='570' cy='81' rx='3.5' ry='6' transform='rotate(0 570 81)'/%3E%3Cellipse cx='578' cy='85' rx='3.5' ry='6' transform='rotate(60 578 85)'/%3E%3Cellipse cx='578' cy='95' rx='3.5' ry='6' transform='rotate(120 578 95)'/%3E%3Cellipse cx='570' cy='99' rx='3.5' ry='6' transform='rotate(180 570 99)'/%3E%3Cellipse cx='562' cy='95' rx='3.5' ry='6' transform='rotate(240 562 95)'/%3E%3Cellipse cx='562' cy='85' rx='3.5' ry='6' transform='rotate(300 562 85)'/%3E%3C!-- Berry clusters --%3E%3C!-- Cluster 1 --%3E%3Ccircle cx='155' cy='505' r='5'/%3E%3Ccircle cx='167' cy='498' r='5'/%3E%3Ccircle cx='162' cy='515' r='5'/%3E%3Ccircle cx='174' cy='508' r='4'/%3E%3Cpath d='M155 500 Q162 490 167 498'/%3E%3Cpath d='M162 510 Q168 500 174 508'/%3E%3C!-- Cluster 2 --%3E%3Ccircle cx='285' cy='380' r='4.5'/%3E%3Ccircle cx='296' cy='373' r='4.5'/%3E%3Ccircle cx='291' cy='389' r='4.5'/%3E%3Ccircle cx='302' cy='382' r='3.5'/%3E%3Cpath d='M285 375 Q291 366 296 373'/%3E%3C!-- Cluster 3 --%3E%3Ccircle cx='400' cy='265' r='4'/%3E%3Ccircle cx='410' cy='259' r='4'/%3E%3Ccircle cx='406' cy='274' r='4'/%3E%3Cpath d='M400 260 Q406 252 410 259'/%3E%3C!-- Cluster 4 --%3E%3Ccircle cx='505' cy='175' r='3.5'/%3E%3Ccircle cx='514' cy='169' r='3.5'/%3E%3Ccircle cx='510' cy='182' r='3.5'/%3E%3Cpath d='M505 170 Q510 163 514 169'/%3E%3C!-- Bottom right branch system --%3E%3Cpath d='M420 700 C480 610 540 525 590 445 C635 370 665 295 685 210'/%3E%3Cpath d='M560 700 C600 625 635 550 660 470 C682 395 692 320 698 240'/%3E%3C!-- Leaves bottom right --%3E%3Cellipse cx='500' cy='620' rx='12' ry='5' transform='rotate(45 500 620)'/%3E%3Cellipse cx='548' cy='565' rx='11' ry='4.5' transform='rotate(50 548 565)'/%3E%3Cellipse cx='592' cy='510' rx='11' ry='4.5' transform='rotate(55 592 510)'/%3E%3Cellipse cx='630' cy='455' rx='10' ry='4' transform='rotate(58 630 455)'/%3E%3C!-- Flower bottom right --%3E%3Ccircle cx='555' cy='590' r='7'/%3E%3Ccircle cx='555' cy='590' r='3'/%3E%3Cellipse cx='555' cy='580' rx='4' ry='6.5' transform='rotate(0 555 580)'/%3E%3Cellipse cx='564' cy='584' rx='4' ry='6.5' transform='rotate(60 564 584)'/%3E%3Cellipse cx='564' cy='596' rx='4' ry='6.5' transform='rotate(120 564 596)'/%3E%3Cellipse cx='555' cy='600' rx='4' ry='6.5' transform='rotate(180 555 600)'/%3E%3Cellipse cx='546' cy='596' rx='4' ry='6.5' transform='rotate(240 546 596)'/%3E%3Cellipse cx='546' cy='584' rx='4' ry='6.5' transform='rotate(300 546 584)'/%3E%3C!-- Top left corner --%3E%3Cpath d='M0 180 C50 140 100 100 155 65'/%3E%3Cpath d='M0 260 C40 220 85 185 135 155'/%3E%3Cellipse cx='62' cy='130' rx='11' ry='4.5' transform='rotate(-52 62 130)'/%3E%3Cellipse cx='108' cy='95' rx='10' ry='4' transform='rotate(-58 108 95)'/%3E%3Ccircle cx='35' cy='160' r='5.5'/%3E%3Ccircle cx='35' cy='160' r='2.5'/%3E%3Ccircle cx='80' cy='120' r='5'/%3E%3Ccircle cx='80' cy='120' r='2.5'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 700px 700px;
+    background-repeat: repeat;
+  }
+
+  /* Ensure content sits above the pattern */
+  #root {
+    position: relative;
+    z-index: 1;
+    background: transparent;
+  }
+
+  /* Force all text to cream */
+  *, *::before, *::after {
+    color: inherit;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    line-height: 1.1;
+    color: #FFFDF7 !important;
+  }
+
+  p, span, li, td, th, label, div {
+    color: inherit;
+  }
+
+  a {
+    color: #FFFDF7 !important;
+  }
+
+  a:hover {
+    color: rgba(255,253,247,0.75) !important;
+  }
+
+  input, textarea, select {
+    color: #FFFDF7 !important;
+    background-color: rgba(0,0,0,0.18) !important;
+    border-color: rgba(255,253,247,0.22) !important;
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: rgba(255,253,247,0.45) !important;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+      max-width: 1440px;
+    }
+  }
+
+  /* SUVARNA Custom Components */
+  .font-display {
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  .font-body {
+    font-family: 'Raleway', sans-serif;
+  }
+
+  /* Sienna palette utility classes */
+  .bg-sienna {
+    background-color: #C17A5A;
+  }
+
+  .bg-glass {
+    background-color: rgba(0,0,0,0.12);
+    backdrop-filter: blur(2px);
+  }
+
+  .bg-card-sienna {
+    background-color: rgba(0,0,0,0.14);
+  }
+
+  .text-cream {
+    color: #FFFDF7 !important;
+  }
+
+  .text-cream-muted {
+    color: rgba(255,253,247,0.85) !important;
+  }
+
+  .text-cream-faint {
+    color: rgba(255,253,247,0.55) !important;
+  }
+
+  .border-cream {
+    border-color: rgba(255,253,247,0.22) !important;
+  }
+
+  .nav-link {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    position: relative;
+    transition: color 200ms ease;
+    color: #FFFDF7 !important;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background-color: #FFFDF7;
+    transition: width 250ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .nav-link:hover::after {
+    width: 100%;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.85rem 2rem;
+    background-color: #FFFDF7;
+    color: #C17A5A !important;
+    border: 1px solid #FFFDF7;
+    transition: all 200ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .btn-primary:hover {
+    background-color: transparent;
+    color: #FFFDF7 !important;
+  }
+
+  .btn-primary:active {
+    transform: scale(0.97);
+  }
+
+  .btn-outline {
+    display: inline-block;
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.85rem 2rem;
+    background-color: transparent;
+    color: #FFFDF7 !important;
+    border: 1px solid rgba(255,253,247,0.6);
+    transition: all 200ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .btn-outline:hover {
+    background-color: rgba(255,253,247,0.15);
+    border-color: #FFFDF7;
+  }
+
+  .btn-outline:active {
+    transform: scale(0.97);
+  }
+
+  /* Product card hover effect */
+  .product-card-img {
+    transition: transform 600ms cubic-bezier(0.23, 1, 0.32, 1);
+    overflow: hidden;
+  }
+
+  .product-card:hover .product-card-img img {
+    transform: scale(1.04);
+  }
+
+  /* Fade-in animation */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fade-in-up {
+    animation: fadeInUp 600ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+
+  /* Thin divider — cream */
+  .divider {
+    width: 100%;
+    height: 1px;
+    background-color: rgba(255,253,247,0.22);
+  }
+
+  /* Section label */
+  .section-label {
+    font-family: 'Raleway', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,253,247,0.65) !important;
+  }
+
+  /* Hero text overlay */
+  .hero-text-overlay {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 2.5rem;
+    right: 2.5rem;
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fade-in-up {
+      animation: none;
+    }
+    .product-card:hover .product-card-img img {
+      transform: none;
+    }
+  }
+}

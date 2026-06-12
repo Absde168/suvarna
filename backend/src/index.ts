@@ -6,6 +6,9 @@ import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import imageRoutes from "./routes/imageRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+import adminProductRoutes from "./routes/adminProductRoutes.js";
+import adminOrderRoutes from "./routes/adminOrderRoutes.js";
 
 const app = express();
 
@@ -21,6 +24,10 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/images", imageRoutes);
 app.use("/api/orders", orderRoutes);
+
+app.use("/api/admin/auth", authRoutes);
+app.use("/api/admin/products", adminProductRoutes);
+app.use("/api/admin/orders", adminOrderRoutes);
 
 const port = process.env.PORT || 4000;
 

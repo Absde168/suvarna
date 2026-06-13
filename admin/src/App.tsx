@@ -10,6 +10,7 @@ import { AdminLayout } from '@/layouts/AdminLayout'
 import LoginPage from '@/pages/LoginPage'
 import ProductsPage from '@/pages/ProductsPage'
 import OrdersPage from '@/pages/OrdersPage'
+import CollectionsPage from '@/pages/CollectionsPage'
 
 const theme = createTheme({
   primaryColor: 'dark',
@@ -44,6 +45,7 @@ export default function App() {
                 >
                   <Route path="/" element={<Navigate to="/products" replace />} />
                   <Route path="/products" element={<ProductsPage />} />
+                  <Route path="/collections" element={<CollectionsPage />} />
                   <Route path="/orders" element={<OrdersPage />} />
                 </Route>
                 <Route path="*" element={<Navigate to="/" replace />} />

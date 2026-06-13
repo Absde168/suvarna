@@ -1,0 +1,25 @@
+# Builds the public frontend and the admin panel, then serves both
+# (plus a reverse proxy to the backend) via Caddy with automatic HTTPS.
+
+FROM node:20-alpine AS frontend-build
+WORKDIR /app
+COPY frontend/package*.json ./
+RUN npm ci
+COPY frontend/ ./
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+RUN npm run build
+
+FROM node:20-alpine AS admin-build
+WORKDIR /app
+COPY admin/package*.json ./
+RUN npm ci
+COPY admin/ ./
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+RUN npm run build
+
+FROM caddy:2-alpine
+COPY --from=frontend-build /app/dist /srv/frontend
+COPY --from=admin-build /app/dist /srv/admin
+COPY Caddyfile /etc/caddy/Caddyfile

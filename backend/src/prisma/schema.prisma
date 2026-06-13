@@ -14,6 +14,23 @@ model Category {
   products Product[]
 }
 
+model Collection {
+  id          Int              @id @default(autoincrement())
+  name        String
+  slug        String           @unique
+  description String?
+  image       CollectionImage?
+  products    Product[]
+}
+
+model CollectionImage {
+  id           Int        @id @default(autoincrement())
+  data         Bytes
+  mimeType     String
+  collectionId Int        @unique
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+}
+
 model Product {
   id           Int         @id @default(autoincrement())
   name         String
@@ -31,6 +48,8 @@ model Product {
   inStock      Boolean     @default(true)
   categoryId   Int?
   category     Category?   @relation(fields: [categoryId], references: [id])
+  collectionId Int?
+  collection   Collection? @relation(fields: [collectionId], references: [id])
   orderItems   OrderItem[]
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt

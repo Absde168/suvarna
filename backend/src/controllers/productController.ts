@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { prisma } from "../prisma.js";
 
-const productListSelect = {
+export const productListSelect = {
   id: true,
   name: true,
   article: true,
@@ -16,6 +16,7 @@ const productListSelect = {
   isBestseller: true,
   inStock: true,
   category: { select: { id: true, name: true, slug: true } },
+  collection: { select: { id: true, name: true, slug: true } },
   images: {
     select: { id: true, position: true, mimeType: true },
     orderBy: { position: "asc" as const },
@@ -23,10 +24,14 @@ const productListSelect = {
 } as const;
 
 export async function getProducts(req: Request, res: Response) {
-  const { category } = req.query;
+  const { category, collection } = req.query;
+
+  const where: Record<string, unknown> = {};
+  if (category) where.category = { slug: String(category) };
+  if (collection) where.collection = { slug: String(collection) };
 
   const products = await prisma.product.findMany({
-    where: category ? { category: { slug: String(category) } } : undefined,
+    where: Object.keys(where).length ? where : undefined,
     select: productListSelect,
     orderBy: { createdAt: "desc" },
   });

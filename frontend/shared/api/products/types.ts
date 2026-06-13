@@ -10,6 +10,12 @@ export interface ProductCategory {
   slug: string;
 }
 
+export interface ProductCollection {
+  id: number;
+  name: string;
+  slug: string;
+}
+
 export interface Product {
   id: number;
   name: string;
@@ -25,11 +31,13 @@ export interface Product {
   isBestseller: boolean;
   inStock: boolean;
   category: ProductCategory | null;
+  collection: ProductCollection | null;
   images: ProductImage[];
 }
 
 export interface GetProductsRequest {
   category?: string;
+  collection?: string;
 }
 
 export type GetProductsResponse = Product[];

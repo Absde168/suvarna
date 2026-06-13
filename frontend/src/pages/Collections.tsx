@@ -1,47 +1,31 @@
 /**
  * SUVARNA Collections Page
  * Style: Warm Botanical Terracotta
- * Shows 3 collections with hero banner images and placeholder text
- * Individual collection pages accessible via /collections/1, /collections/2, /collections/3
+ * Lists real collections from the backend and shows their products
  */
 import { Link, useParams } from 'wouter';
 import { ArrowLeft } from 'lucide-react';
-
-const COLLECTIONS = [
-  {
-    id: '1',
-    name: 'Коллекция 1',
-    label: 'Коллекция',
-    description: 'Скоро здесь появится описание коллекции',
-    image: '/manus-storage/hero_collection_1_3fcb03ab.jpg',
-    href: '/collections/1',
-  },
-  {
-    id: '2',
-    name: 'Коллекция 2',
-    label: 'Коллекция',
-    description: 'Скоро здесь появится описание коллекции',
-    image: '/manus-storage/hero_collection_2_2c6fdd53.jpg',
-    href: '/collections/2',
-  },
-  {
-    id: '3',
-    name: 'Коллекция 3',
-    label: 'Коллекция',
-    description: 'Скоро здесь появится описание коллекции',
-    image: '/manus-storage/hero_collection_3_eb610a33.jpg',
-    href: '/collections/3',
-  },
-];
+import { useCollections, useCollection } from '@/entities/collections';
+import { getCollectionImageUrl } from '@shared/api';
+import ProductCard from '@/components/ProductCard';
 
 // Individual collection page
-function CollectionDetail({ id }: { id: string }) {
-  const col = COLLECTIONS.find(c => c.id === id);
-  if (!col) {
+function CollectionDetail({ slug }: { slug: string }) {
+  const { data: collection, isLoading } = useCollection(slug);
+
+  if (isLoading) {
+    return (
+      <main className="pt-20 lg:pt-24 min-h-screen flex items-center justify-center">
+        <p className="font-display text-2xl font-light" style={{ color: '#FFFDF7' }}>Загрузка…</p>
+      </main>
+    );
+  }
+
+  if (!collection) {
     return (
       <main className="pt-20 lg:pt-24 min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="font-display text-3xl text-cream mb-4">Коллекция не найдена</p>
+          <p className="font-display text-3xl font-light mb-4" style={{ color: '#FFFDF7' }}>Коллекция не найдена</p>
           <Link href="/collections">
             <span className="btn-outline">← Все коллекции</span>
           </Link>
@@ -52,50 +36,38 @@ function CollectionDetail({ id }: { id: string }) {
 
   return (
     <main className="pt-20 lg:pt-24 min-h-screen">
-      {/* Hero banner */}
-      <div className="relative w-full aspect-[16/7] overflow-hidden">
-        <img
-          src={col.image}
-          alt={col.name}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-        <div className="absolute bottom-8 left-8 lg:bottom-14 lg:left-16">
-          <p className="section-label text-cream-faint mb-2">{col.label}</p>
-          <h1 className="font-display text-5xl lg:text-7xl font-light text-cream leading-none">
-            {col.name}
-          </h1>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <Link href="/collections">
-          <span className="inline-flex items-center gap-2 section-label text-cream-faint hover:text-cream transition-colors cursor-pointer mb-10 group">
-            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+          <span className="inline-flex items-center gap-2 section-label mb-6 hover:opacity-70 transition-opacity cursor-pointer" style={{ color: 'rgba(255,253,247,0.65)' }}>
+            <ArrowLeft size={14} />
             Все коллекции
           </span>
         </Link>
 
-        <div className="max-w-2xl">
-          <p className="font-body text-xl text-cream-muted leading-relaxed">
-            {col.description}
+        <div className="flex items-baseline justify-between mb-2">
+          <h1 className="font-display text-4xl lg:text-6xl font-light" style={{ color: '#FFFDF7' }}>
+            {collection.name}
+          </h1>
+          <p className="section-label">
+            {collection.products.length} {collection.products.length === 1 ? 'товар' : collection.products.length < 5 ? 'товара' : 'товаров'}
           </p>
         </div>
+        <div className="divider mb-8" />
 
-        {/* Placeholder for future collection content */}
-        <div className="mt-16 py-20 border border-cream/10 flex items-center justify-center rounded-none"
-          style={{ background: 'rgba(0,0,0,0.10)' }}>
-          <p className="font-display text-2xl text-cream/40 font-light">
-            Скоро здесь появится описание коллекции
-          </p>
-        </div>
-
-        <div className="mt-12">
-          <Link href="/catalog">
-            <span className="btn-primary">Перейти в каталог</span>
-          </Link>
-        </div>
+        {collection.products.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24">
+            <p className="font-display text-3xl font-light mb-2" style={{ color: '#FFFDF7' }}>В этой коллекции пока нет товаров</p>
+            <Link href="/catalog">
+              <span className="btn-outline mt-4">Перейти в каталог</span>
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6 pb-20">
+            {collection.products.map((product, i) => (
+              <ProductCard key={product.id} product={product} index={i} />
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );
@@ -103,6 +75,8 @@ function CollectionDetail({ id }: { id: string }) {
 
 // Collections list page
 function CollectionsList() {
+  const { data: collections, isLoading } = useCollections();
+
   return (
     <main className="pt-20 lg:pt-24 min-h-screen">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
@@ -114,33 +88,85 @@ function CollectionsList() {
         </div>
         <div className="divider mb-12" />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-          {COLLECTIONS.map((col) => (
-            <Link key={col.id} href={col.href}>
-              <div className="group cursor-pointer">
-                <div className="aspect-[3/4] overflow-hidden mb-4 relative"
-                  style={{ background: 'rgba(0,0,0,0.14)' }}>
-                  <img
-                    src={col.image}
-                    alt={col.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute bottom-6 left-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <span className="btn-outline text-sm">Смотреть коллекцию</span>
-                  </div>
+        {isLoading ? (
+          <div className="space-y-16">
+            {Array(3).fill(null).map((_, i) => (
+              <div key={i} className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center animate-pulse">
+                <div className="aspect-[4/5]" style={{ backgroundColor: 'rgba(255,253,247,0.08)' }} />
+                <div className="space-y-4">
+                  <div className="h-3 w-24" style={{ backgroundColor: 'rgba(255,253,247,0.08)' }} />
+                  <div className="h-10 w-2/3" style={{ backgroundColor: 'rgba(255,253,247,0.08)' }} />
+                  <div className="h-24 w-full" style={{ backgroundColor: 'rgba(255,253,247,0.08)' }} />
                 </div>
-                <p className="section-label text-cream-faint mb-1">{col.label}</p>
-                <h2 className="font-display text-2xl font-light text-cream group-hover:opacity-70 transition-opacity">
-                  {col.name}
-                </h2>
-                <p className="font-body text-sm text-cream-muted mt-1 leading-relaxed">
-                  {col.description}
-                </p>
               </div>
-            </Link>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : !collections || collections.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24">
+            <p className="font-display text-3xl font-light" style={{ color: '#FFFDF7' }}>Коллекции скоро появятся</p>
+          </div>
+        ) : (
+          <div className="space-y-20 lg:space-y-32 pb-20">
+            {collections.map((col, index) => {
+              const paragraphs = (col.description ?? '').split('\n').filter((p) => p.trim().length > 0);
+              const imageFirst = index % 2 === 0;
+
+              const image = (
+                <div className="group h-[500px] overflow-hidden relative flex items-center justify-center"
+                  style={{ background: 'rgba(0,0,0,0.14)' }}>
+                  {col.hasImage ? (
+                    <img
+                      src={getCollectionImageUrl({ id: col.id, width: 1200 })}
+                      alt={col.name}
+                      className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                    />
+                  ) : (
+                    <p className="font-display text-3xl font-light text-cream/30">
+                      {col.name}
+                    </p>
+                  )}
+                </div>
+              );
+
+              const text = (
+                <div className="flex flex-col items-start">
+                  <p className="section-label text-cream-faint mb-3">Коллекция</p>
+                  <h2 className="font-display text-4xl lg:text-5xl font-light text-cream mb-6">
+                    {col.name}
+                  </h2>
+                  <div className="space-y-4 mb-8">
+                    {paragraphs.map((p, i) => (
+                      <p key={i} className="font-body text-sm text-cream-muted leading-relaxed whitespace-pre-line">
+                        {p}
+                      </p>
+                    ))}
+                  </div>
+                  <Link href={`/collections/${col.slug}`}>
+                    <span className="section-label inline-flex items-center gap-2 text-cream hover:opacity-70 transition-opacity cursor-pointer">
+                      Смотреть коллекцию →
+                    </span>
+                  </Link>
+                </div>
+              );
+
+              return (
+                <div key={col.id} className="grid grid-cols-1 md:grid-cols-[55%_45%] gap-8 lg:gap-16 items-center">
+                  {imageFirst ? (
+                    <>
+                      {image}
+                      {text}
+                    </>
+                  ) : (
+                    <>
+                      <div className="md:order-2">{image}</div>
+                      <div className="md:order-1">{text}</div>
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </main>
   );
@@ -149,7 +175,7 @@ function CollectionsList() {
 export default function Collections() {
   const params = useParams<{ id?: string }>();
   if (params.id) {
-    return <CollectionDetail id={params.id} />;
+    return <CollectionDetail slug={params.id} />;
   }
   return <CollectionsList />;
 }

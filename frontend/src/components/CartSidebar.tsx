@@ -61,9 +61,11 @@ export default function CartSidebar() {
                   <div className="w-20 h-24 flex-shrink-0 overflow-hidden" style={{ backgroundColor: 'rgba(0,0,0,0.15)' }}>
                     {item.product.images[0] && (
                       <img
-                        src={getImageUrl({ id: item.product.images[0].id })}
+                        src={getImageUrl({ id: item.product.images[0].id, width: 400 })}
                         alt={item.product.name}
                         className="w-full h-full object-cover"
+                        loading="lazy"
+                        decoding="async"
                       />
                     )}
                   </div>

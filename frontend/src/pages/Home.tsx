@@ -125,7 +125,7 @@ export default function Home() {
     return () => clearInterval(timer);
   }, [nextSlide]);
 
-  const { data: products } = useProducts();
+  const { data: products, isLoading: productsLoading } = useProducts();
 
   const bestsellers = (products ?? []).filter(p => p.isBestseller).slice(0, 4);
   const newArrivals = (products ?? []).filter(p => p.isNew).slice(0, 4);
@@ -209,9 +209,9 @@ export default function Home() {
 
       {/* === MARQUEE STRIP === */}
       <div className="py-3 overflow-hidden" style={{ backgroundColor: 'rgba(0,0,0,0.2)', borderTop: '1px solid rgba(255,253,247,0.15)', borderBottom: '1px solid rgba(255,253,247,0.15)' }}>
-        <div className="flex gap-12 animate-[marquee_20s_linear_infinite] whitespace-nowrap">
-          {Array(4).fill(null).map((_, i) => (
-            <span key={i} className="flex items-center gap-12 font-body text-[10px] font-500 tracking-[0.2em] uppercase" style={{ color: 'rgba(255,253,247,0.65)' }}>
+        <div className="flex w-max gap-12 animate-[marquee_20s_linear_infinite] whitespace-nowrap">
+          {Array(2).fill(null).map((_, i) => (
+            <span key={i} className="flex flex-shrink-0 items-center gap-12 font-body text-[10px] font-500 tracking-[0.2em] uppercase" style={{ color: 'rgba(255,253,247,0.65)' }}>
               <span>Натуральные ткани</span>
               <span style={{ color: 'rgba(255,253,247,0.4)' }}>✦</span>
               <span>Авторские принты</span>
@@ -283,9 +283,19 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-            {bestsellers.map((product, i) => (
-              <ProductCard key={product.id} product={product} index={i} />
-            ))}
+            {productsLoading ? (
+              Array(4).fill(null).map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="aspect-[3/4] mb-3" style={{ backgroundColor: 'rgba(255,253,247,0.08)' }} />
+                  <div className="h-3 w-2/3 mb-2" style={{ backgroundColor: 'rgba(255,253,247,0.08)' }} />
+                  <div className="h-3 w-1/3" style={{ backgroundColor: 'rgba(255,253,247,0.08)' }} />
+                </div>
+              ))
+            ) : (
+              bestsellers.map((product, i) => (
+                <ProductCard key={product.id} product={product} index={i} />
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -339,9 +349,19 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-          {newArrivals.map((product, i) => (
-            <ProductCard key={product.id} product={product} index={i} />
-          ))}
+          {productsLoading ? (
+            Array(4).fill(null).map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="aspect-[3/4] mb-3" style={{ backgroundColor: 'rgba(255,253,247,0.08)' }} />
+                <div className="h-3 w-2/3 mb-2" style={{ backgroundColor: 'rgba(255,253,247,0.08)' }} />
+                <div className="h-3 w-1/3" style={{ backgroundColor: 'rgba(255,253,247,0.08)' }} />
+              </div>
+            ))
+          ) : (
+            newArrivals.map((product, i) => (
+              <ProductCard key={product.id} product={product} index={i} />
+            ))
+          )}
         </div>
       </section>
 

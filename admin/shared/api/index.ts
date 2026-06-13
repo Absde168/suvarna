@@ -6,6 +6,9 @@ export * from "./auth/types";
 export * from "./categories";
 export * from "./categories/types";
 
+export * from "./collections";
+export * from "./collections/types";
+
 export * from "./products";
 export * from "./products/types";
 

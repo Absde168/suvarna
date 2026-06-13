@@ -17,6 +17,7 @@ const adminProductSelect = {
   isBestseller: true,
   inStock: true,
   category: { select: { id: true, name: true, slug: true } },
+  collection: { select: { id: true, name: true, slug: true } },
   images: {
     select: { id: true, position: true, mimeType: true },
     orderBy: { position: "asc" as const },
@@ -121,6 +122,7 @@ interface ProductInput {
   isBestseller?: boolean;
   inStock?: boolean;
   categoryId?: number | null;
+  collectionId?: number | null;
 }
 
 function buildProductData(body: ProductInput): Prisma.ProductUncheckedCreateInput {
@@ -138,6 +140,7 @@ function buildProductData(body: ProductInput): Prisma.ProductUncheckedCreateInpu
     isBestseller: Boolean(body.isBestseller),
     inStock: body.inStock ?? true,
     categoryId: body.categoryId ?? null,
+    collectionId: body.collectionId ?? null,
   };
 }
 

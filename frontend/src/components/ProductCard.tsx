@@ -24,10 +24,11 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
         <div className="product-card-img relative overflow-hidden aspect-[3/4]" style={{ backgroundColor: 'rgba(0,0,0,0.14)' }}>
           {product.images[0] && (
             <img
-              src={getImageUrl({ id: product.images[0].id })}
+              src={getImageUrl({ id: product.images[0].id, width: 600 })}
               alt={product.name}
               className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
               loading="lazy"
+              decoding="async"
             />
           )}
           {/* Badges */}
@@ -48,10 +49,11 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
           {/* Hover second image */}
           {product.images[1] && (
             <img
-              src={getImageUrl({ id: product.images[1].id })}
+              src={getImageUrl({ id: product.images[1].id, width: 600 })}
               alt={product.name}
               className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
               loading="lazy"
+              decoding="async"
             />
           )}
         </div>

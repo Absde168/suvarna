@@ -395,9 +395,11 @@ export default function Checkout() {
                     <div className="w-14 h-18 flex-shrink-0 overflow-hidden bg-card-sienna">
                       {item.product.images[0] && (
                         <img
-                          src={getImageUrl({ id: item.product.images[0].id })}
+                          src={getImageUrl({ id: item.product.images[0].id, width: 400 })}
                           alt={item.product.name}
                           className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
                         />
                       )}
                     </div>

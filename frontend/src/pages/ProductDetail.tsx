@@ -114,7 +114,7 @@ export default function ProductDetail() {
                     selectedImage === i ? 'border-[#111111]' : 'border-transparent opacity-60 hover:opacity-100'
                   }`}
                 >
-                  <img src={getImageUrl({ id: img.id })} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
+                  <img src={getImageUrl({ id: img.id, width: 400 })} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                 </button>
               ))}
             </div>
@@ -122,9 +122,10 @@ export default function ProductDetail() {
             <div className="flex-1 aspect-[3/4] overflow-hidden" style={{ backgroundColor: 'rgba(0,0,0,0.15)' }}>
               {product.images[selectedImage] && (
                 <img
-                  src={getImageUrl({ id: product.images[selectedImage].id })}
+                  src={getImageUrl({ id: product.images[selectedImage].id, width: 1200 })}
                   alt={product.name}
                   className="w-full h-full object-cover transition-opacity duration-300"
+                  decoding="async"
                 />
               )}
             </div>

@@ -13,7 +13,10 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
           {/* Brand */}
           <div>
-            <h2 className="font-display text-3xl tracking-[0.2em] font-light mb-4" style={{ color: '#FFFDF7' }}>SUVARNA</h2>
+            <div className="flex items-center gap-2.5 mb-4">
+              <img src="/images/logo-icon-white.png" alt="" style={{ height: '32px', width: 'auto', opacity: 0.92 }} />
+              <h2 className="font-display text-3xl tracking-[0.2em] font-light" style={{ color: '#FFFDF7' }}>SUVARNA</h2>
+            </div>
             <p className="font-body text-sm leading-relaxed mb-6" style={{ color: 'rgba(255,253,247,0.7)' }}>
               Российский дизайнерский бренд женской одежды с индийским наследием. Авторские принты, натуральные ткани, ручная работа.
             </p>

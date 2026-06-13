@@ -21,6 +21,7 @@ import { notifications } from '@mantine/notifications'
 import { getImageUrl } from '@shared/api'
 import type { Product, ProductInput } from '@shared/api'
 import { useCategories } from '@/entities/categories'
+import { useCollections } from '@/entities/collections'
 import {
   useAddProductImage,
   useCreateProduct,
@@ -30,7 +31,7 @@ import {
   useUpdateProduct,
 } from '@/entities/products'
 
-const SIZE_OPTIONS = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+const SIZE_OPTIONS = ['One Size', 'XS', 'S', 'M', 'L', 'XL', 'XXL']
 
 const EMPTY_FORM: ProductInput = {
   name: '',
@@ -46,6 +47,7 @@ const EMPTY_FORM: ProductInput = {
   isBestseller: false,
   inStock: true,
   categoryId: null,
+  collectionId: null,
 }
 
 interface ProductFormModalProps {
@@ -56,6 +58,7 @@ interface ProductFormModalProps {
 
 export function ProductFormModal({ opened, onClose, product: initialProduct }: ProductFormModalProps) {
   const { data: categories } = useCategories()
+  const { data: collections } = useCollections()
   const createProduct = useCreateProduct()
   const updateProduct = useUpdateProduct()
   const addImage = useAddProductImage()
@@ -69,28 +72,32 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
   const [colorsInput, setColorsInput] = useState('')
 
   useEffect(() => {
-    if (product) {
+    if (!opened) return
+
+    if (initialProduct) {
       setForm({
-        name: product.name,
-        article: product.article,
-        price: product.price,
-        quantity: product.quantity,
-        sizes: product.sizes,
-        colors: product.colors,
-        description: product.description ?? '',
-        fabric: product.fabric ?? '',
-        care: product.care ?? '',
-        isNew: product.isNew,
-        isBestseller: product.isBestseller,
-        inStock: product.inStock,
-        categoryId: product.category?.id ?? null,
+        name: initialProduct.name,
+        article: initialProduct.article,
+        price: initialProduct.price,
+        quantity: initialProduct.quantity,
+        sizes: initialProduct.sizes,
+        colors: initialProduct.colors,
+        description: initialProduct.description ?? '',
+        fabric: initialProduct.fabric ?? '',
+        care: initialProduct.care ?? '',
+        isNew: initialProduct.isNew,
+        isBestseller: initialProduct.isBestseller,
+        inStock: initialProduct.inStock,
+        categoryId: initialProduct.category?.id ?? null,
+        collectionId: initialProduct.collection?.id ?? null,
       })
-      setColorsInput(product.colors.join(', '))
+      setColorsInput(initialProduct.colors.join(', '))
     } else {
       setForm(EMPTY_FORM)
       setColorsInput('')
     }
-  }, [product, opened])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialProduct?.id, opened])
 
   const isSaving = createProduct.isPending || updateProduct.isPending
 
@@ -167,7 +174,10 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
             <TextInput
               label="Название"
               value={form.name}
-              onChange={(e) => setForm((f) => ({ ...f, name: e.currentTarget.value }))}
+              onChange={(e) => {
+                const value = e.currentTarget.value
+                setForm((f) => ({ ...f, name: value }))
+              }}
               required
             />
           </Grid.Col>
@@ -175,11 +185,14 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
             <TextInput
               label="Артикул"
               value={form.article}
-              onChange={(e) => setForm((f) => ({ ...f, article: e.currentTarget.value }))}
+              onChange={(e) => {
+                const value = e.currentTarget.value
+                setForm((f) => ({ ...f, article: value }))
+              }}
               required
             />
           </Grid.Col>
-          <Grid.Col span={4}>
+          <Grid.Col span={3}>
             <NumberInput
               label="Цена"
               value={form.price}
@@ -187,7 +200,7 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
               min={0}
             />
           </Grid.Col>
-          <Grid.Col span={4}>
+          <Grid.Col span={3}>
             <NumberInput
               label="Количество"
               value={form.quantity}
@@ -195,12 +208,21 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
               min={0}
             />
           </Grid.Col>
-          <Grid.Col span={4}>
+          <Grid.Col span={3}>
             <Select
               label="Категория"
               data={(categories ?? []).map((c) => ({ value: String(c.id), label: c.name }))}
               value={form.categoryId != null ? String(form.categoryId) : null}
               onChange={(value) => setForm((f) => ({ ...f, categoryId: value ? Number(value) : null }))}
+              clearable
+            />
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <Select
+              label="Коллекция"
+              data={(collections ?? []).map((c) => ({ value: String(c.id), label: c.name }))}
+              value={form.collectionId != null ? String(form.collectionId) : null}
+              onChange={(value) => setForm((f) => ({ ...f, collectionId: value ? Number(value) : null }))}
               clearable
             />
           </Grid.Col>
@@ -216,14 +238,20 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
             <TextInput
               label="Цвета (через запятую)"
               value={colorsInput}
-              onChange={(e) => setColorsInput(e.currentTarget.value)}
+              onChange={(e) => {
+                const value = e.currentTarget.value
+                setColorsInput(value)
+              }}
             />
           </Grid.Col>
           <Grid.Col span={12}>
             <Textarea
               label="Описание"
               value={form.description ?? ''}
-              onChange={(e) => setForm((f) => ({ ...f, description: e.currentTarget.value }))}
+              onChange={(e) => {
+                const value = e.currentTarget.value
+                setForm((f) => ({ ...f, description: value }))
+              }}
               minRows={2}
             />
           </Grid.Col>
@@ -231,7 +259,10 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
             <Textarea
               label="Состав/материал"
               value={form.fabric ?? ''}
-              onChange={(e) => setForm((f) => ({ ...f, fabric: e.currentTarget.value }))}
+              onChange={(e) => {
+                const value = e.currentTarget.value
+                setForm((f) => ({ ...f, fabric: value }))
+              }}
               minRows={2}
             />
           </Grid.Col>
@@ -239,7 +270,10 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
             <Textarea
               label="Уход"
               value={form.care ?? ''}
-              onChange={(e) => setForm((f) => ({ ...f, care: e.currentTarget.value }))}
+              onChange={(e) => {
+                const value = e.currentTarget.value
+                setForm((f) => ({ ...f, care: value }))
+              }}
               minRows={2}
             />
           </Grid.Col>
@@ -248,17 +282,26 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
               <Checkbox
                 label="Новинка"
                 checked={!!form.isNew}
-                onChange={(e) => setForm((f) => ({ ...f, isNew: e.currentTarget.checked }))}
+                onChange={(e) => {
+                  const checked = e.currentTarget.checked
+                  setForm((f) => ({ ...f, isNew: checked }))
+                }}
               />
               <Checkbox
                 label="Бестселлер"
                 checked={!!form.isBestseller}
-                onChange={(e) => setForm((f) => ({ ...f, isBestseller: e.currentTarget.checked }))}
+                onChange={(e) => {
+                  const checked = e.currentTarget.checked
+                  setForm((f) => ({ ...f, isBestseller: checked }))
+                }}
               />
               <Checkbox
                 label="В наличии"
                 checked={!!form.inStock}
-                onChange={(e) => setForm((f) => ({ ...f, inStock: e.currentTarget.checked }))}
+                onChange={(e) => {
+                  const checked = e.currentTarget.checked
+                  setForm((f) => ({ ...f, inStock: checked }))
+                }}
               />
             </Group>
           </Grid.Col>

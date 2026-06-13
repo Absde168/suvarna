@@ -1,6 +1,6 @@
 import { AppShell, Group, NavLink, Text, Burger, Button } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconShirt, IconShoppingCart, IconLogout } from '@tabler/icons-react'
+import { IconShirt, IconShoppingCart, IconLogout, IconStack2 } from '@tabler/icons-react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/entities/auth'
 
@@ -25,6 +25,7 @@ export function AdminLayout() {
         <Group h="100%" px="md" justify="space-between">
           <Group>
             <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+            <img src="/images/logo-icon.png" alt="" style={{ height: 28, width: 'auto' }} />
             <Text fw={700} size="lg">
               SUVARNA Admin
             </Text>
@@ -42,6 +43,13 @@ export function AdminLayout() {
           label="Товары"
           leftSection={<IconShirt size={18} />}
           active={location.pathname.startsWith('/products')}
+        />
+        <NavLink
+          component={Link}
+          to="/collections"
+          label="Коллекции"
+          leftSection={<IconStack2 size={18} />}
+          active={location.pathname.startsWith('/collections')}
         />
         <NavLink
           component={Link}

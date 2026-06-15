@@ -50,6 +50,16 @@ export default function Header() {
           {/* Main nav row */}
           <div className="flex items-center h-16 lg:h-20 relative">
 
+            {/* Logo icon — top-left */}
+            <Link href="/" className="mr-8 lg:mr-12 select-none flex items-center h-full py-2">
+              <img
+                src="/images/logo-icon-white.png"
+                alt=""
+                className="select-none h-full w-auto"
+                style={{ opacity: 0.92 }}
+              />
+            </Link>
+
             {/* Left Nav — Desktop */}
             <nav className="hidden lg:flex items-center gap-8 flex-1">
               {navLeft.map(item => (
@@ -63,13 +73,7 @@ export default function Header() {
 
             {/* SUVARNA — Centered absolutely */}
             <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none select-none">
-              <Link href="/" className="pointer-events-auto flex items-center gap-2.5">
-                <img
-                  src="/images/logo-icon-white.png"
-                  alt=""
-                  className="select-none"
-                  style={{ height: '28px', width: 'auto', opacity: 0.92 }}
-                />
+              <Link href="/" className="pointer-events-auto">
                 <span
                   className="font-display tracking-[0.25em] font-light"
                   style={{ color: '#FFFDF7', fontSize: '1.6rem', letterSpacing: '0.28em' }}

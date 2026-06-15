@@ -85,21 +85,6 @@ export default function Catalog() {
               {cat.name}
             </button>
           ))}
-          {collections.length > 0 && (
-            <>
-              <div className="w-px h-5 mx-2 flex-shrink-0" style={{ backgroundColor: 'rgba(255,253,247,0.2)' }} />
-              {collections.map(col => (
-                <button
-                  key={col.slug}
-                  onClick={() => { setActiveCollection(col.slug); setActiveCategory('all'); }}
-                  style={activeCollection === col.slug ? { backgroundColor: '#FFFDF7', color: '#C17A5A', border: '1px solid #FFFDF7' } : { backgroundColor: 'transparent', color: 'rgba(255,253,247,0.7)', border: '1px solid rgba(255,253,247,0.3)' }}
-                  className="flex-1 text-center whitespace-nowrap font-body text-[10px] font-500 tracking-[0.15em] uppercase px-4 py-2 transition-all duration-200"
-                >
-                  {col.name}
-                </button>
-              ))}
-            </>
-          )}
           {activeCollection && (
             <button
               onClick={() => { setActiveCategory('all'); setActiveCollection(''); }}

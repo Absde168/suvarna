@@ -112,7 +112,7 @@ function CollectionsList() {
               const imageFirst = index % 2 === 0;
 
               const image = (
-                <div className="group h-[500px] overflow-hidden relative flex items-center justify-center"
+                <div className="group h-[600px] md:h-full md:min-h-[640px] overflow-hidden relative flex items-center justify-center"
                   style={{ background: 'rgba(0,0,0,0.14)' }}>
                   {col.hasImage ? (
                     <img
@@ -131,12 +131,12 @@ function CollectionsList() {
               const text = (
                 <div className="flex flex-col items-start">
                   <p className="section-label text-cream-faint mb-3">Коллекция</p>
-                  <h2 className="font-display text-4xl lg:text-5xl font-light text-cream mb-6">
+                  <h2 className="font-display text-6xl lg:text-8xl font-light text-cream mb-6 uppercase tracking-wide">
                     {col.name}
                   </h2>
                   <div className="space-y-4 mb-8">
                     {paragraphs.map((p, i) => (
-                      <p key={i} className="font-body text-sm text-cream-muted leading-relaxed whitespace-pre-line">
+                      <p key={i} className="font-body text-base lg:text-lg text-cream-muted leading-relaxed whitespace-pre-line">
                         {p}
                       </p>
                     ))}
@@ -150,7 +150,7 @@ function CollectionsList() {
               );
 
               return (
-                <div key={col.id} className="grid grid-cols-1 md:grid-cols-[55%_45%] gap-8 lg:gap-16 items-center">
+                <div key={col.id} className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 items-stretch">
                   {imageFirst ? (
                     <>
                       {image}

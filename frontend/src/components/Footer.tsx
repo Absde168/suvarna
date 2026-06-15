@@ -5,8 +5,24 @@
  * - Cream text hierarchy
  */
 import { Link } from 'wouter';
+import { useCategories } from '@/entities/categories';
 
 export default function Footer() {
+  const { data: categoriesData } = useCategories();
+  // Желаемый порядок категорий в подвале (как в каталоге)
+  const order = ['platya', 'zhakety', 'trenchi', 'bluzy', 'bryuki', 'kostyumy'];
+  const productCategories = (categoriesData ?? [])
+    .filter(c => c.slug !== 'novinki')
+    .sort((a, b) => {
+      const ia = order.indexOf(a.slug);
+      const ib = order.indexOf(b.slug);
+      return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+    });
+  const catalogLinks = [
+    { label: 'Все товары', href: '/catalog' },
+    ...productCategories.map(c => ({ label: c.name, href: `/catalog?category=${c.slug}` })),
+    { label: 'Новинки', href: '/catalog?category=novinki' },
+  ];
   return (
     <footer className="mt-24" style={{ backgroundColor: 'rgba(0,0,0,0.22)', backdropFilter: 'blur(4px)', borderTop: '1px solid rgba(255,253,247,0.15)' }}>
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -36,17 +52,7 @@ export default function Footer() {
           <div>
             <h3 className="section-label mb-4" style={{ color: 'rgba(255,253,247,0.5)' }}>Каталог</h3>
             <ul className="space-y-2.5">
-              {[
-                { label: 'Все товары', href: '/catalog' },
-                { label: 'Платья', href: '/catalog?category=platya' },
-                { label: 'Жакеты', href: '/catalog?category=zhakety' },
-                { label: 'Тренчи', href: '/catalog?category=trenchi' },
-                { label: 'Блузки', href: '/catalog?category=bluzki' },
-                { label: 'Штаны', href: '/catalog?category=shtany' },
-                { label: 'Ветровки', href: '/catalog?category=vetrovki' },
-                { label: 'Костюмы', href: '/catalog?category=kostyumy' },
-                { label: 'Новинки', href: '/catalog?filter=new' },
-              ].map(item => (
+              {catalogLinks.map(item => (
                 <li key={item.href}>
                   <Link href={item.href}>
                     <span className="font-body text-sm transition-opacity hover:opacity-100" style={{ color: 'rgba(255,253,247,0.7)', display: 'block' }}>

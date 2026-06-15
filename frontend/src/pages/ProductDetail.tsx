@@ -50,12 +50,20 @@ export default function ProductDetail() {
 
   const related = (categoryProducts ?? []).filter(p => p.id !== product.id).slice(0, 4);
 
+  // Размеры: только у брючных костюмов (категория «Костюмы») есть сетка XS–XL,
+  // все остальные модели — единый размер One Size.
+  const displaySizes = product.category?.slug === 'kostyumy'
+    ? product.sizes.filter(s => s !== 'One Size')
+    : ['One Size'];
+  const singleSize = displaySizes.length === 1;
+  const effectiveSize = singleSize ? displaySizes[0] : selectedSize;
+
   const handleAddToCart = () => {
-    if (!selectedSize) {
+    if (!effectiveSize) {
       toast.error('Пожалуйста, выберите размер');
       return;
     }
-    addItem(product, selectedSize);
+    addItem(product, effectiveSize);
     toast.success(`${product.name} добавлен в корзину`);
   };
 
@@ -180,12 +188,12 @@ export default function ProductDetail() {
                 </Link>
               </div>
               <div className="flex flex-wrap gap-2">
-                {product.sizes.map(size => (
+                {displaySizes.map(size => (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    style={selectedSize === size ? { backgroundColor: '#FFFDF7', color: '#C17A5A', border: '1px solid #FFFDF7' } : { backgroundColor: 'transparent', color: '#FFFDF7', border: '1px solid rgba(255,253,247,0.35)' }}
-                    className="w-12 h-10 font-body text-sm transition-all duration-200"
+                    style={effectiveSize === size ? { backgroundColor: '#FFFDF7', color: '#C17A5A', border: '1px solid #FFFDF7' } : { backgroundColor: 'transparent', color: '#FFFDF7', border: '1px solid rgba(255,253,247,0.35)' }}
+                    className="min-w-12 h-10 px-3 font-body text-sm transition-all duration-200"
                   >
                     {size}
                   </button>
@@ -198,7 +206,7 @@ export default function ProductDetail() {
               onClick={handleAddToCart}
               className="btn-primary w-full mb-3"
             >
-              {selectedSize ? `Добавить в корзину — ${formatPrice(product.price)}` : 'Выберите размер'}
+              {effectiveSize ? `Добавить в корзину — ${formatPrice(product.price)}` : 'Выберите размер'}
             </button>
             <button className="btn-outline w-full mb-6">
               Заказать примерку
@@ -222,7 +230,7 @@ export default function ProductDetail() {
                   </button>
                   {openAccordion === item.key && (
                     <div className="pb-4">
-                      <p className="font-body text-sm leading-relaxed" style={{ color: 'rgba(255,253,247,0.8)' }}>
+                      <p className="font-body text-sm leading-relaxed whitespace-pre-line" style={{ color: 'rgba(255,253,247,0.8)' }}>
                         {item.content}
                       </p>
                     </div>

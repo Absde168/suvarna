@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String
+  slug     String    @unique
+  products Product[]
+}
+
+model Collection {
+  id          Int              @id @default(autoincrement())
+  name        String
+  slug        String           @unique
+  description String?
+  image       CollectionImage?
+  products    Product[]
+}
+
+model CollectionImage {
+  id           Int        @id @default(autoincrement())
+  data         Bytes
+  mimeType     String
+  collectionId Int        @unique
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+}
+
+model Product {
+  id           Int         @id @default(autoincrement())
+  name         String
+  article      String      @unique
+  price        Int
+  quantity     Int         @default(0)
+  sizes        String[]
+  colors       String[]
+  images       ProductImage[]
+  description  String?
+  fabric       String?
+  care         String?
+  isNew        Boolean     @default(false)
+  isBestseller Boolean     @default(false)
+  inStock      Boolean     @default(true)
+  categoryId   Int?
+  category     Category?   @relation(fields: [categoryId], references: [id])
+  collectionId Int?
+  collection   Collection? @relation(fields: [collectionId], references: [id])
+  orderItems   OrderItem[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  data      Bytes
+  mimeType  String
+  position  Int     @default(0) // порядковый номер для сортировки в карточке
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, position])
+}
+
+model Order {
+  id             Int         @id @default(autoincrement())
+  firstName      String
+  lastName       String
+  phone          String
+  email          String
+  deliveryMethod String     // courier | pickup | cdek | post
+  city           String?
+  address        String?
+  apartment      String?
+  comment        String?
+  status         String      @default("new")
+  totalPrice     Int
+  items          OrderItem[]
+  payment        Payment?
+  createdAt      DateTime    @default(now())
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  size      String
+  quantity  Int
+  price     Int     // цена на момент покупки
+}
+
+model Payment {
+  id         Int       @id @default(autoincrement())
+  orderId    Int       @unique
+  order      Order     @relation(fields: [orderId], references: [id])
+  method     String    // card | sbp | cod
+  status     String    @default("pending") // pending | paid | failed | refunded
+  amount     Int
+  currency   String    @default("RUB")
+  providerId String?   // id транзакции у платёжного провайдера
+  paidAt     DateTime?
+  createdAt  DateTime  @default(now())
+}

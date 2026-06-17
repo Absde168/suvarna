@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'wouter';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import ProductCard from '@/components/ProductCard';
 import { useProducts } from '@/entities/products';
 import { getHeroSlides, getHeroSlideImageUrl } from '@shared/api/heroSlides';
+import { getPageImageUrl } from '@shared/api/pageImages';
 
 const DEFAULT_HERO_SLIDES = [
   { id: 0, image: '/images/collections/barbeque.jpg', label: 'Коллекция', title: 'Barbeque', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections', align: 'left' },
@@ -14,14 +15,16 @@ const DEFAULT_HERO_SLIDES = [
 ];
 
 const CATEGORY_CARDS = [
-  { label: 'Платья', slug: 'platya', image: '/manus-storage/dress_5_f2819b26.jpg', count: 12 },
-  { label: 'Жакеты', slug: 'zhakety', image: '/manus-storage/jacket_1_d889054d.jpg', count: 2 },
-  { label: 'Тренчи', slug: 'trenchi', image: '/manus-storage/trench_03_03208356.jpg', count: 7 },
-  { label: 'Блузки', slug: 'bluzki', image: '/manus-storage/blouse_1_cca9e890.jpg', count: 6 },
-  { label: 'Штаны', slug: 'shtany', image: '/manus-storage/pants_4_003d7df1.jpg', count: 2 },
-  { label: 'Ветровки', slug: 'vetrovki', image: '/manus-storage/wind_3_469998e3.jpg', count: 3 },
-  { label: 'Костюмы', slug: 'kostyumy', image: '/manus-storage/suit_1_f9b7b581.jpg', count: 3 },
+  { label: 'Платья', slug: 'platya', key: 'category-platya' },
+  { label: 'Жакеты', slug: 'zhakety', key: 'category-zhakety' },
+  { label: 'Тренчи', slug: 'trenchi', key: 'category-trenchi' },
+  { label: 'Блузки', slug: 'bluzki', key: 'category-bluzki' },
+  { label: 'Штаны', slug: 'shtany', key: 'category-shtany' },
+  { label: 'Ветровки', slug: 'vetrovki', key: 'category-vetrovki' },
+  { label: 'Костюмы', slug: 'kostyumy', key: 'category-kostyumy' },
 ];
+
+const LOOKBOOK_KEYS = ['lookbook-1', 'lookbook-2', 'lookbook-3', 'lookbook-4', 'lookbook-5', 'lookbook-6'];
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -179,7 +182,7 @@ export default function Home() {
               <div className="group cursor-pointer" style={{ animationDelay: `${i * 80}ms` }}>
                 <div className="relative overflow-hidden aspect-[3/4] mb-3" style={{ backgroundColor: 'rgba(0,0,0,0.15)' }}>
                   <img
-                    src={cat.image}
+                    src={getPageImageUrl(cat.key)}
                     alt={cat.label}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
                     loading="lazy"
@@ -190,7 +193,7 @@ export default function Home() {
                   <h3 className="font-body text-sm font-500 tracking-wide" style={{ color: '#FFFDF7' }}>
                     {cat.label}
                   </h3>
-                  <span className="section-label">{cat.count}</span>
+                  
                 </div>
               </div>
             </Link>
@@ -239,7 +242,7 @@ export default function Home() {
           <div className="relative">
             <div className="aspect-[4/5] overflow-hidden">
               <img
-                src="/manus-storage/dress_1_87f2438c.jpg"
+                src={getPageImageUrl("brand-story")}
                 alt="О бренде SUVARNA"
                 className="w-full h-full object-cover"
               />
@@ -311,17 +314,10 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
-            {[
-              '/manus-storage/dress_10_b9724543.jpg',
-              '/manus-storage/trench_05_0698a37d.jpg',
-              '/manus-storage/jacket_1_d889054d.jpg',
-              '/manus-storage/blouse_1_cca9e890.jpg',
-              '/manus-storage/pants_4_003d7df1.jpg',
-              '/manus-storage/dress_5_f2819b26.jpg',
-            ].map((img, i) => (
+            {LOOKBOOK_KEYS.map((key, i) => (
               <div key={i} className="aspect-[3/4] overflow-hidden group cursor-pointer">
                 <img
-                  src={img}
+                  src={getPageImageUrl(key)}
                   alt={`Lookbook ${i + 1}`}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
                   loading="lazy"

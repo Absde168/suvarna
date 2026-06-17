@@ -115,6 +115,13 @@ model HeroSlideImage {
   slide    HeroSlide @relation(fields: [slideId], references: [id], onDelete: Cascade)
 }
 
+model PageImage {
+  id       Int    @id @default(autoincrement())
+  key      String @unique
+  data     Bytes
+  mimeType String
+}
+
 model Payment {
   id         Int       @id @default(autoincrement())
   orderId    Int       @unique

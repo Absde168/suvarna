@@ -1,5 +1,10 @@
 import type { Request, Response } from "express";
 import { prisma } from "../prisma.js";
+import { randomUUID } from "crypto";
+
+const YOKASSA_SHOP_ID = process.env.YOKASSA_SHOP_ID!;
+const YOKASSA_SECRET_KEY = process.env.YOKASSA_SECRET_KEY!;
+const APP_URL = process.env.APP_URL || "https://iamsuvarna.ru";
 
 const DELIVERY_PRICES: Record<string, number> = {
   courier: 500,
@@ -7,6 +12,72 @@ const DELIVERY_PRICES: Record<string, number> = {
   cdek: 350,
   post: 350,
 };
+
+const ONLINE_METHODS = new Set(["card", "sbp"]);
+
+const YOKASSA_METHOD_MAP: Record<string, string> = {
+  card: "bank_card",
+  sbp: "sbp",
+};
+
+async function createYokassaPayment(params: {
+  amount: number;
+  orderId: number;
+  paymentMethod: string;
+  customerEmail: string;
+}): Promise<{ yokassaId: string; confirmationUrl: string }> {
+  const idempotenceKey = randomUUID();
+  const credentials = Buffer.from(`${YOKASSA_SHOP_ID}:${YOKASSA_SECRET_KEY}`).toString("base64");
+
+  const body = {
+    amount: {
+      value: (params.amount / 100).toFixed(2),
+      currency: "RUB",
+    },
+    confirmation: {
+      type: "redirect",
+      return_url: `${APP_URL}/payment/return?orderId=${params.orderId}`,
+    },
+    capture: true,
+    description: `Заказ №${params.orderId}`,
+    payment_method_type: YOKASSA_METHOD_MAP[params.paymentMethod] ?? "bank_card",
+    receipt: {
+      customer: { email: params.customerEmail },
+      items: [
+        {
+          description: `Заказ №${params.orderId}`,
+          quantity: "1.00",
+          amount: {
+            value: (params.amount / 100).toFixed(2),
+            currency: "RUB",
+          },
+          vat_code: 1,
+        },
+      ],
+    },
+  };
+
+  const response = await fetch("https://api.yookassa.ru/v3/payments", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Basic ${credentials}`,
+      "Idempotence-Key": idempotenceKey,
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`ЮKасса error ${response.status}: ${err}`);
+  }
+
+  const data = await response.json() as any;
+  return {
+    yokassaId: data.id,
+    confirmationUrl: data.confirmation.confirmation_url,
+  };
+}
 
 const orderSelect = {
   id: true,
@@ -88,6 +159,27 @@ export async function createOrder(req: Request, res: Response) {
     },
     select: orderSelect,
   });
+
+  if (ONLINE_METHODS.has(paymentMethod)) {
+    try {
+      const { yokassaId, confirmationUrl } = await createYokassaPayment({
+        amount: totalPrice,
+        orderId: order.id,
+        paymentMethod,
+        customerEmail: email,
+      });
+
+      await prisma.payment.update({
+        where: { orderId: order.id },
+        data: { providerId: yokassaId },
+      });
+
+      return res.status(201).json({ ...order, confirmationUrl });
+    } catch (err) {
+      console.error("ЮKасса payment creation failed:", err);
+      return res.status(201).json(order);
+    }
+  }
 
   res.status(201).json(order);
 }

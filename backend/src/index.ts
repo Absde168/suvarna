@@ -8,6 +8,8 @@ import productRoutes from "./routes/productRoutes.js";
 import imageRoutes from "./routes/imageRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
+import heroSlideRoutes from "./routes/heroSlideRoutes.js";
+import adminHeroSlideRoutes from "./routes/adminHeroSlideRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import adminProductRoutes from "./routes/adminProductRoutes.js";
 import adminOrderRoutes from "./routes/adminOrderRoutes.js";
@@ -29,11 +31,13 @@ app.use("/api/products", productRoutes);
 app.use("/api/images", imageRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/hero-slides", heroSlideRoutes);
 
 app.use("/api/admin/auth", authRoutes);
 app.use("/api/admin/products", adminProductRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
 app.use("/api/admin/collections", adminCollectionRoutes);
+app.use("/api/admin/hero-slides", adminHeroSlideRoutes);
 
 const port = process.env.PORT || 4000;
 

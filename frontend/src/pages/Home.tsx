@@ -1,107 +1,40 @@
-/**
- * SUVARNA Home Page
- * Style: Fashion Editorial Minimal
- * Sections:
- *   1. Hero — full-screen slider with real product photos
- *   2. Category grid — 5 categories
- *   3. Bestsellers — 4 products
- *   4. Brand story strip
- *   5. New arrivals — 4 products
- *   6. Instagram-style lookbook strip
- */
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'wouter';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import ProductCard from '@/components/ProductCard';
 import { useProducts } from '@/entities/products';
+import { getHeroSlides, getHeroSlideImageUrl } from '@shared/api/heroSlides';
 
-const HERO_SLIDES = [
-  {
-    image: '/images/collections/barbeque.jpg',
-    label: 'Коллекция',
-    title: 'Barbeque',
-    subtitle: 'Скоро здесь появится описание коллекции',
-    cta: 'Смотреть коллекцию',
-    href: '/collections',
-    align: 'left',
-  },
-  {
-    image: '/images/collections/nisha.jpg',
-    label: 'Коллекция',
-    title: 'Nisha',
-    subtitle: 'Скоро здесь появится описание коллекции',
-    cta: 'Смотреть коллекцию',
-    href: '/collections',
-    align: 'right',
-  },
-  {
-    image: '/images/collections/tara.jpg',
-    label: 'Коллекция',
-    title: 'Tara',
-    subtitle: 'Скоро здесь появится описание коллекции',
-    cta: 'Смотреть коллекцию',
-    href: '/collections',
-    align: 'left',
-  },
-  {
-    image: '/images/collections/tej.jpg',
-    label: 'Коллекция',
-    title: 'Tej',
-    subtitle: 'Скоро здесь появится описание коллекции',
-    cta: 'Смотреть коллекцию',
-    href: '/collections',
-    align: 'right',
-  },
+const DEFAULT_HERO_SLIDES = [
+  { id: 0, image: '/images/collections/barbeque.jpg', label: 'Коллекция', title: 'Barbeque', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections', align: 'left' },
+  { id: 0, image: '/images/collections/nisha.jpg', label: 'Коллекция', title: 'Nisha', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections', align: 'right' },
+  { id: 0, image: '/images/collections/tara.jpg', label: 'Коллекция', title: 'Tara', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections', align: 'left' },
+  { id: 0, image: '/images/collections/tej.jpg', label: 'Коллекция', title: 'Tej', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections', align: 'right' },
 ];
 
 const CATEGORY_CARDS = [
-  {
-    label: 'Платья',
-    slug: 'platya',
-    image: '/manus-storage/dress_5_f2819b26.jpg',
-    count: 12,
-  },
-  {
-    label: 'Жакеты',
-    slug: 'zhakety',
-    image: '/manus-storage/jacket_1_d889054d.jpg',
-    count: 2,
-  },
-  {
-    label: 'Тренчи',
-    slug: 'trenchi',
-    image: '/manus-storage/trench_03_03208356.jpg',
-    count: 7,
-  },
-  {
-    label: 'Блузки',
-    slug: 'bluzki',
-    image: '/manus-storage/blouse_1_cca9e890.jpg',
-    count: 6,
-  },
-  {
-    label: 'Штаны',
-    slug: 'shtany',
-    image: '/manus-storage/pants_4_003d7df1.jpg',
-    count: 2,
-  },
-  {
-    label: 'Ветровки',
-    slug: 'vetrovki',
-    image: '/manus-storage/wind_3_469998e3.jpg',
-    count: 3,
-  },
-  {
-    label: 'Костюмы',
-    slug: 'kostyumy',
-    image: '/manus-storage/suit_1_f9b7b581.jpg',
-    count: 3,
-  },
+  { label: 'Платья', slug: 'platya', image: '/manus-storage/dress_5_f2819b26.jpg', count: 12 },
+  { label: 'Жакеты', slug: 'zhakety', image: '/manus-storage/jacket_1_d889054d.jpg', count: 2 },
+  { label: 'Тренчи', slug: 'trenchi', image: '/manus-storage/trench_03_03208356.jpg', count: 7 },
+  { label: 'Блузки', slug: 'bluzki', image: '/manus-storage/blouse_1_cca9e890.jpg', count: 6 },
+  { label: 'Штаны', slug: 'shtany', image: '/manus-storage/pants_4_003d7df1.jpg', count: 2 },
+  { label: 'Ветровки', slug: 'vetrovki', image: '/manus-storage/wind_3_469998e3.jpg', count: 3 },
+  { label: 'Костюмы', slug: 'kostyumy', image: '/manus-storage/suit_1_f9b7b581.jpg', count: 3 },
 ];
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+
+  const { data: apiSlides } = useQuery({ queryKey: ['hero-slides'], queryFn: getHeroSlides });
+
+  const heroSlides = apiSlides && apiSlides.length > 0
+    ? apiSlides.map(s => ({
+        ...s,
+        image: s.image ? getHeroSlideImageUrl(s.id, 1600) : '/images/collections/barbeque.jpg',
+      }))
+    : DEFAULT_HERO_SLIDES;
 
   const goToSlide = useCallback((idx: number) => {
     if (isTransitioning) return;
@@ -113,12 +46,12 @@ export default function Home() {
   }, [isTransitioning]);
 
   const nextSlide = useCallback(() => {
-    goToSlide((currentSlide + 1) % HERO_SLIDES.length);
-  }, [currentSlide, goToSlide]);
+    goToSlide((currentSlide + 1) % heroSlides.length);
+  }, [currentSlide, goToSlide, heroSlides.length]);
 
   const prevSlide = useCallback(() => {
-    goToSlide((currentSlide - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
-  }, [currentSlide, goToSlide]);
+    goToSlide((currentSlide - 1 + heroSlides.length) % heroSlides.length);
+  }, [currentSlide, goToSlide, heroSlides.length]);
 
   useEffect(() => {
     const timer = setInterval(nextSlide, 5000);
@@ -130,14 +63,13 @@ export default function Home() {
   const bestsellers = (products ?? []).filter(p => p.isBestseller).slice(0, 4);
   const newArrivals = (products ?? []).filter(p => p.isNew).slice(0, 4);
 
-  const slide = HERO_SLIDES[currentSlide];
+  const slide = heroSlides[currentSlide] ?? heroSlides[0];
 
   return (
     <main>
       {/* === HERO === */}
       <section className="relative h-screen min-h-[600px] max-h-[900px] overflow-hidden" style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}>
-        {/* Slides */}
-        {HERO_SLIDES.map((s, i) => (
+        {heroSlides.map((s, i) => (
           <div
             key={i}
             className={`absolute inset-0 transition-opacity duration-700 ${
@@ -149,7 +81,6 @@ export default function Home() {
               alt={s.title}
               className="w-full h-full object-cover object-top"
             />
-            {/* Subtle gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
           </div>
         ))}
@@ -166,9 +97,11 @@ export default function Home() {
           <h1 className="font-display text-5xl lg:text-6xl font-light text-white leading-none mb-3">
             {slide.title}
           </h1>
-          <p className="font-body text-sm text-white/80 mb-5 font-300">
-            {slide.subtitle}
-          </p>
+          {slide.subtitle && (
+            <p className="font-body text-sm text-white/80 mb-5 font-300">
+              {slide.subtitle}
+            </p>
+          )}
           <Link href={slide.href}>
             <span className="inline-flex items-center gap-2 font-body text-[10px] font-500 tracking-[0.15em] uppercase text-white border-b border-white/60 pb-0.5 hover:border-white transition-colors">
               {slide.cta}
@@ -179,7 +112,7 @@ export default function Home() {
 
         {/* Slide controls */}
         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-3">
-          {HERO_SLIDES.map((_, i) => (
+          {heroSlides.map((_, i) => (
             <button
               key={i}
               onClick={() => goToSlide(i)}
@@ -311,7 +244,6 @@ export default function Home() {
                 className="w-full h-full object-cover"
               />
             </div>
-            {/* Decorative offset frame */}
             <div className="absolute -bottom-4 -right-4 w-2/3 h-2/3 -z-10" style={{ border: '1px solid rgba(255,253,247,0.3)' }} />
           </div>
           <div>
@@ -335,17 +267,17 @@ export default function Home() {
       {/* === NEW ARRIVALS === */}
       <section className="py-12 lg:py-16 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8" style={{ color: '#FFFDF7' }}>
         <div className="flex items-baseline justify-between mb-8">
-            <div>
-              <p className="section-label mb-1">Только что добавлено</p>
-              <h2 className="font-display text-4xl lg:text-5xl font-light" style={{ color: '#FFFDF7' }}>
-                Новинки
-              </h2>
-            </div>
-            <Link href="/catalog?filter=new">
-              <span className="nav-link flex items-center gap-1.5" style={{ color: 'rgba(255,253,247,0.7)' }}>
-                Все новинки <ArrowRight size={12} />
-              </span>
-            </Link>
+          <div>
+            <p className="section-label mb-1">Только что добавлено</p>
+            <h2 className="font-display text-4xl lg:text-5xl font-light" style={{ color: '#FFFDF7' }}>
+              Новинки
+            </h2>
+          </div>
+          <Link href="/catalog?filter=new">
+            <span className="nav-link flex items-center gap-1.5" style={{ color: 'rgba(255,253,247,0.7)' }}>
+              Все новинки <ArrowRight size={12} />
+            </span>
+          </Link>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">

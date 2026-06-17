@@ -95,6 +95,26 @@ model OrderItem {
   price     Int     // цена на момент покупки
 }
 
+model HeroSlide {
+  id       Int             @id @default(autoincrement())
+  title    String
+  label    String          @default("Коллекция")
+  subtitle String          @default("")
+  cta      String          @default("Смотреть коллекцию")
+  href     String          @default("/collections")
+  align    String          @default("left")
+  position Int             @default(0)
+  image    HeroSlideImage?
+}
+
+model HeroSlideImage {
+  id       Int       @id @default(autoincrement())
+  data     Bytes
+  mimeType String
+  slideId  Int       @unique
+  slide    HeroSlide @relation(fields: [slideId], references: [id], onDelete: Cascade)
+}
+
 model Payment {
   id         Int       @id @default(autoincrement())
   orderId    Int       @unique

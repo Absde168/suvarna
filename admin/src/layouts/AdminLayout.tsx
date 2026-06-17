@@ -1,6 +1,6 @@
 import { AppShell, Group, NavLink, Text, Burger, Button } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconShirt, IconShoppingCart, IconLogout, IconStack2 } from '@tabler/icons-react'
+import { IconShirt, IconShoppingCart, IconLogout, IconStack2, IconPhoto } from '@tabler/icons-react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/entities/auth'
 
@@ -57,6 +57,13 @@ export function AdminLayout() {
           label="Заказы"
           leftSection={<IconShoppingCart size={18} />}
           active={location.pathname.startsWith('/orders')}
+        />
+        <NavLink
+          component={Link}
+          to="/homepage"
+          label="Главная страница"
+          leftSection={<IconPhoto size={18} />}
+          active={location.pathname.startsWith('/homepage')}
         />
       </AppShell.Navbar>
 

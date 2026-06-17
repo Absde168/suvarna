@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import sharp from "sharp";
 import multer from "multer";
-import { prisma } from "../prisma/client.js";
+import { prisma } from "../prisma.js";
 
 export const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
 
@@ -42,7 +42,7 @@ export async function deletePageImage(req: Request, res: Response) {
   res.json({ ok: true });
 }
 
-export async function listPageImages(req: Request, res: Response) {
+export async function listPageImages(_req: Request, res: Response) {
   const imgs = await prisma.pageImage.findMany({ select: { key: true } });
-  res.json(imgs.map(i => i.key));
+  res.json(imgs.map((img) => img.key));
 }

@@ -11,7 +11,7 @@ import {
   getHeroSlides, createHeroSlide, updateHeroSlide, deleteHeroSlide,
   setHeroSlideImage, deleteHeroSlideImage, getHeroSlideImageUrl,
 } from '@shared/api/heroSlides'
-import { getPageImageUrl, setPageImage, listPageImages } from '@shared/api/pageImages'
+import { getPageImageUrl, setPageImage, deletePageImage, listPageImages } from '@shared/api/pageImages'
 import type { HeroSlide } from '@shared/api/heroSlides/types'
 
 const EMPTY_FORM = {
@@ -43,7 +43,15 @@ function ImageSlot({ slot, uploadedKeys }: { slot: { key: string; label: string 
     mutationFn: (file: File) => setPageImage(slot.key, file),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['page-images-list'] })
-      notifications.show({ title: `${slot.label} обновлено`, message: '', color: 'green' })
+      notifications.show({ title: slot.label + ' обновлено', message: '', color: 'green' })
+    },
+  })
+
+  const deleteMut = useMutation({
+    mutationFn: () => deletePageImage(slot.key),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['page-images-list'] })
+      notifications.show({ title: slot.label + ' удалено', message: '', color: 'orange' })
     },
   })
 
@@ -51,13 +59,12 @@ function ImageSlot({ slot, uploadedKeys }: { slot: { key: string; label: string 
     <Card withBorder padding="sm" radius="md">
       <Text size="xs" fw={600} mb={6}>{slot.label}</Text>
       {hasImage ? (
-        <Image
-          src={getPageImageUrl(slot.key)}
-          height={120}
-          radius="sm"
-          fit="cover"
-          mb={6}
-        />
+        <div style={{ position: 'relative' }}>
+          <Image src={getPageImageUrl(slot.key)} height={120} radius="sm" fit="cover" mb={6} />
+          <ActionIcon color="red" variant="filled" size="xs" style={{ position: 'absolute', top: 4, right: 4 }} onClick={() => deleteMut.mutate()} loading={deleteMut.isPending}>
+            <IconTrash size={10} />
+          </ActionIcon>
+        </div>
       ) : (
         <div style={{ height: 120, background: '#f0f0f0', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 6 }}>
           <IconPhoto size={28} color="#aaa" />
@@ -73,6 +80,7 @@ function ImageSlot({ slot, uploadedKeys }: { slot: { key: string; label: string 
     </Card>
   )
 }
+
 
 export default function HomepagePage() {
   const qc = useQueryClient()

@@ -31,7 +31,7 @@ async function createYokassaPayment(params: {
 
   const body = {
     amount: {
-      value: (params.amount / 100).toFixed(2),
+      value: params.amount.toFixed(2),
       currency: "RUB",
     },
     confirmation: {
@@ -48,7 +48,7 @@ async function createYokassaPayment(params: {
           description: `Заказ №${params.orderId}`,
           quantity: "1.00",
           amount: {
-            value: (params.amount / 100).toFixed(2),
+            value: params.amount.toFixed(2),
             currency: "RUB",
           },
           vat_code: 1,

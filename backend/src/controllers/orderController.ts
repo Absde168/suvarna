@@ -52,6 +52,8 @@ async function createYokassaPayment(params: {
             currency: "RUB",
           },
           vat_code: 1,
+          payment_subject: "commodity",
+          payment_mode: "full_payment",
         },
       ],
     },

@@ -12,7 +12,7 @@ export async function getPageImage(req: Request, res: Response) {
   const img = await prisma.pageImage.findUnique({ where: { key } });
   if (!img) return res.status(404).json({ error: "Not found" });
 
-  let buf = Buffer.from(img.data);
+  let buf = Buffer.from(img.data as any);
   if (w) buf = await sharp(buf).resize(w, undefined, { withoutEnlargement: true }).toBuffer();
 
   res.set("Content-Type", img.mimeType);

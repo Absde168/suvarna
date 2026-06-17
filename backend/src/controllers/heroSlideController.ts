@@ -80,7 +80,8 @@ export async function setHeroSlideImage(req: Request, res: Response) {
   if (Number.isNaN(slideId)) return res.status(400).json({ error: "Некорректный id" });
   if (!req.file) return res.status(400).json({ error: "Файл не загружен" });
 
-  const data = req.file.buffer;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data = req.file.buffer as any;
   const mimeType = req.file.mimetype;
 
   await prisma.heroSlideImage.upsert({

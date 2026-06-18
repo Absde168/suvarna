@@ -300,33 +300,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* === LOOKBOOK STRIP === */}
-      <section className="py-12 lg:py-16" style={{ backgroundColor: 'rgba(0,0,0,0.18)' }}>
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-baseline justify-between mb-8">
-            <h2 className="font-display text-4xl lg:text-5xl font-light" style={{ color: '#FFFDF7' }}>
-              Лукбук
-            </h2>
-            <Link href="/collections">
-              <span className="nav-link flex items-center gap-1.5" style={{ color: 'rgba(255,253,247,0.7)' }}>
-                Коллекции <ArrowRight size={12} />
-              </span>
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
-            {LOOKBOOK_KEYS.map((key, i) => (
-              <div key={i} className="aspect-[3/4] overflow-hidden group cursor-pointer">
-                <img
-                  src={getPageImageUrl(key)}
-                  alt={`Lookbook ${i + 1}`}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
-                  loading="lazy"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* === LOOKBOOK STRIP — скрыт === */}
 
       {/* === DELIVERY STRIP === */}
       <section className="py-12" style={{ borderTop: '1px solid rgba(255,253,247,0.18)' }}>

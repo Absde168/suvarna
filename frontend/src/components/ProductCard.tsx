@@ -21,7 +21,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
         style={{ animationDelay: `${index * 60}ms` }}
       >
         {/* Image */}
-        <div className="product-card-img relative overflow-hidden aspect-[3/4]" style={{ backgroundColor: 'rgba(0,0,0,0.14)' }}>
+        <div className="product-card-img relative overflow-hidden aspect-[2/3]" style={{ backgroundColor: 'rgba(0,0,0,0.14)' }}>
           {product.images[0] && (
             <img
               src={getImageUrl({ id: product.images[0].id, width: 600 })}

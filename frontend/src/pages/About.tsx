@@ -76,17 +76,17 @@ export default function About() {
               Зора Полковникова
             </h2>
             <div className="divider mb-6 max-w-[80px]" />
-            <p className="font-body text-sm text-cream-muted leading-relaxed mb-4">
+            <p className="font-body text-base text-cream-muted leading-relaxed mb-5">
               Более 15 лет Зора занималась персональной стилистикой, пошивом гардероба и проведением курсов по стилю. Постепенно профессиональный интерес привёл её к тканям — сначала европейским, а затем и к совершенно особому миру.
             </p>
-            <p className="font-body text-sm text-cream-muted leading-relaxed mb-4">
+            <p className="font-body text-base text-cream-muted leading-relaxed mb-5">
               Вместе с партнёрами Оксаной Кривошеевой и Анной Степановой она открыла текстильный рынок Мумбаи — крупнейший в Азии — и навсегда влюбилась в индийский текстиль. Так родилась компания A+Fabrics, а затем и бренд SUVARNA.
             </p>
-            <p className="font-body text-sm text-cream-muted leading-relaxed mb-8">
+            <p className="font-body text-base text-cream-muted leading-relaxed mb-8">
               Название SUVARNA на санскрите означает «золото», «золотая». Золотая линия одежды для райских птиц — именно так Зора видит своих клиенток: яркими, особенными, живущими насыщенной жизнью.
             </p>
             <div className="bg-card-sienna p-6 lg:p-8">
-              <p className="font-display italic text-lg font-light text-cream leading-relaxed mb-4">
+              <p className="font-display italic text-xl font-light text-cream leading-relaxed mb-4">
                 «Fashion — это мост между культурами. Каждое платье SUVARNA — это путешествие, которое начинается в Индии и завершается в вашей жизни.»
               </p>
               <p className="section-label text-cream-faint">— Зора Полковникова</p>

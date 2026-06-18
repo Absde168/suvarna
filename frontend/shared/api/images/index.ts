@@ -8,7 +8,8 @@ export function getImageUrl({ id, width }: GetImageUrlRequest): GetImageUrlRespo
 }
 
 export function getCollectionImageUrl({ id, width }: GetImageUrlRequest): GetImageUrlResponse {
+  const t = Math.floor(Date.now() / 60000); // меняется каждую минуту
   return width
-    ? `${api.defaults.baseURL}/images/collection/${id}?w=${width}`
-    : `${api.defaults.baseURL}/images/collection/${id}`;
+    ? `${api.defaults.baseURL}/images/collection/${id}?w=${width}&t=${t}`
+    : `${api.defaults.baseURL}/images/collection/${id}?t=${t}`;
 }

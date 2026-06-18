@@ -54,5 +54,6 @@ export async function getCollectionImageById(req: Request, res: Response) {
     return res.status(404).json({ error: "Изображение не найдено" });
   }
 
+  res.setHeader("Cache-Control", "no-cache");
   await sendImage(res, image, Number(req.query.w));
 }

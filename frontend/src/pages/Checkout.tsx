@@ -62,7 +62,7 @@ export default function Checkout() {
       }
       setStep('delivery');
     } else if (step === 'delivery') {
-      if (!form.city) {
+      if (form.deliveryMethod !== 'pickup' && !form.city) {
         toast.error('Укажите город доставки');
         return;
       }

@@ -62,8 +62,8 @@ export default function About() {
 
       {/* Designer */}
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-        <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 lg:items-stretch">
-          <div className="overflow-hidden bg-card-sienna lg:w-1/2 self-stretch">
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 lg:items-start">
+          <div className="overflow-hidden bg-card-sienna lg:w-1/2 aspect-[3/4]">
             <img
               src="/images/about-designer.jpg"
               alt="Зора Полковникова — дизайнер SUVARNA"

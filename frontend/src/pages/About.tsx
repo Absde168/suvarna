@@ -67,7 +67,7 @@ export default function About() {
             <img
               src="/images/about-designer.jpg"
               alt="Зора Полковникова — дизайнер SUVARNA"
-              className="absolute inset-0 w-full h-full object-cover object-top"
+              className="absolute inset-0 w-full h-full object-cover object-center"
             />
           </div>
           <div>

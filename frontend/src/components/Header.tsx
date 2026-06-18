@@ -75,7 +75,7 @@ export default function Header() {
             <div className="absolute left-1/2 -translate-x-1/2 pointer-events-none select-none">
               <Link href="/" className="pointer-events-auto">
                 <span
-                  className="font-display tracking-[0.25em] font-normal"
+                  className="font-display tracking-[0.25em] font-semibold"
                   style={{ color: '#FFFDF7', fontSize: '2rem', letterSpacing: '0.28em' }}
                 >
                   SUVARNA

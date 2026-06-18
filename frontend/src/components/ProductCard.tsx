@@ -26,7 +26,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             <img
               src={getImageUrl({ id: product.images[0].id, width: 600 })}
               alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+              className="w-full h-full object-contain transition-transform duration-700 ease-out group-hover:scale-[1.04]"
               loading="lazy"
               decoding="async"
             />
@@ -51,7 +51,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             <img
               src={getImageUrl({ id: product.images[1].id, width: 600 })}
               alt={product.name}
-              className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              className="absolute inset-0 w-full h-full object-contain opacity-0 group-hover:opacity-100 transition-opacity duration-500"
               loading="lazy"
               decoding="async"
             />

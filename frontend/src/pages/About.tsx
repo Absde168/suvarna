@@ -64,9 +64,8 @@ export default function About() {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
           <div
-            className="min-h-[320px] lg:min-h-0"
+            className="min-h-[320px]"
             style={{
-              height: '100%',
               backgroundImage: 'url(/images/about-designer.jpg)',
               backgroundSize: 'cover',
               backgroundPosition: 'top center',

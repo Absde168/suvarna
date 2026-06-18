@@ -27,6 +27,7 @@ export default function CollectionsPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Collection | null>(null)
   const [form, setForm] = useState<CollectionInput>(EMPTY_FORM)
+  const [imageTs, setImageTs] = useState(Date.now())
 
   useEffect(() => {
     if (!editing) return
@@ -201,7 +202,7 @@ export default function CollectionsPage() {
                     setCollectionImage.mutate(
                       { id: editing.id, file },
                       {
-                        onSuccess: () => notifications.show({ color: 'green', message: 'Изображение обновлено' }),
+                        onSuccess: () => { setImageTs(Date.now()); notifications.show({ color: 'green', message: 'Изображение обновлено' }) },
                         onError: () => notifications.show({ color: 'red', title: 'Ошибка', message: 'Не удалось загрузить изображение' }),
                       }
                     )
@@ -217,7 +218,7 @@ export default function CollectionsPage() {
               </Group>
               {editing.hasImage && (
                 <Stack gap={4} align="flex-start">
-                  <Image src={getCollectionImageUrl({ id: editing.id })} h={160} w="auto" fit="cover" radius="sm" />
+                  <Image src={getCollectionImageUrl({ id: editing.id, t: imageTs })} h={160} w="auto" fit="cover" radius="sm" />
                   <ActionIcon
                     size="sm"
                     variant="subtle"

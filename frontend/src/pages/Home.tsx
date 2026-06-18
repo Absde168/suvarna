@@ -8,7 +8,7 @@ import { getHeroSlides, getHeroSlideImageUrl } from '@shared/api/heroSlides';
 import { getPageImageUrl } from '@shared/api/pageImages';
 
 const DEFAULT_HERO_SLIDES = [
-  { id: 0, image: '/images/collections/barbeque.jpg', label: 'Коллекция', title: 'Barbeque', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections', align: 'left' },
+  { id: 0, image: '/images/collections/barbeque.jpg', label: 'Коллекция', title: 'BAROQUE GARDEN', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections', align: 'left' },
   { id: 0, image: '/images/collections/nisha.jpg', label: 'Коллекция', title: 'Nisha', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections', align: 'right' },
   { id: 0, image: '/images/collections/tara.jpg', label: 'Коллекция', title: 'Tara', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections', align: 'left' },
   { id: 0, image: '/images/collections/tej.jpg', label: 'Коллекция', title: 'Tej', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections', align: 'right' },

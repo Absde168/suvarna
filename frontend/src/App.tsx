@@ -1,7 +1,8 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
+import { useEffect } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { CartProvider } from "./contexts/CartContext";
@@ -22,6 +23,12 @@ import Privacy from "./pages/Privacy";
 import Search from "./pages/Search";
 import Care from "./pages/Care";
 import PaymentReturn from "./pages/PaymentReturn";
+
+function ScrollToTop() {
+  const [location] = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [location]);
+  return null;
+}
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -68,6 +75,7 @@ function App() {
         <CartProvider>
           <TooltipProvider>
             <Toaster position="bottom-right" />
+            <ScrollToTop />
             <Router />
           </TooltipProvider>
         </CartProvider>

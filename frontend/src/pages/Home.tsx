@@ -37,16 +37,27 @@ export default function Home() {
 
   const collectionBySlug = Object.fromEntries((collections ?? []).map(c => [c.slug, c]));
 
-  const heroSlides = apiSlides && apiSlides.length > 0
-    ? apiSlides.map(s => {
-        const slug = s.href?.match(/^\/collections\/(.+)$/)?.[1];
-        const col = slug ? collectionBySlug[slug] : null;
-        const image = col?.hasImage
-          ? getCollectionImageUrl({ id: col.id, width: 1600 })
-          : s.image ? getHeroSlideImageUrl(s.id, 1600) : '/images/collections/barbeque.jpg';
-        return { ...s, image };
-      })
+  const baseSlides = apiSlides && apiSlides.length > 0
+    ? apiSlides.map(s => ({
+        id: s.id,
+        image: s.image ? getHeroSlideImageUrl(s.id, 1600) : '/images/collections/barbeque.jpg',
+        label: s.label ?? 'Коллекция',
+        title: s.title,
+        subtitle: s.subtitle ?? '',
+        cta: s.cta ?? 'Смотреть коллекцию',
+        href: s.href ?? '/',
+        align: s.align ?? 'left',
+      }))
     : DEFAULT_HERO_SLIDES;
+
+  const heroSlides = baseSlides.map(s => {
+    const slug = s.href?.match(/^\/collections\/(.+)$/)?.[1];
+    const col = slug ? collectionBySlug[slug] : null;
+    const image = col?.hasImage
+      ? getCollectionImageUrl({ id: col.id, width: 1600 })
+      : s.image;
+    return { ...s, image };
+  });
 
   const goToSlide = useCallback((idx: number) => {
     if (isTransitioning) return;

@@ -6,6 +6,8 @@ import ProductCard from '@/components/ProductCard';
 import { useProducts } from '@/entities/products';
 import { getHeroSlides, getHeroSlideImageUrl } from '@shared/api/heroSlides';
 import { getPageImageUrl } from '@shared/api/pageImages';
+import { getCollections } from '@shared/api';
+import { getCollectionImageUrl } from '@shared/api';
 
 const DEFAULT_HERO_SLIDES = [
   { id: 0, image: '/images/collections/barbeque.jpg', label: 'Коллекция', title: 'BAROQUE GARDEN', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections/baroque-garden', align: 'left' },
@@ -31,12 +33,19 @@ export default function Home() {
   const [isTransitioning, setIsTransitioning] = useState(false);
 
   const { data: apiSlides } = useQuery({ queryKey: ['hero-slides'], queryFn: getHeroSlides });
+  const { data: collections } = useQuery({ queryKey: ['collections'], queryFn: getCollections });
+
+  const collectionBySlug = Object.fromEntries((collections ?? []).map(c => [c.slug, c]));
 
   const heroSlides = apiSlides && apiSlides.length > 0
-    ? apiSlides.map(s => ({
-        ...s,
-        image: s.image ? getHeroSlideImageUrl(s.id, 1600) : '/images/collections/barbeque.jpg',
-      }))
+    ? apiSlides.map(s => {
+        const slug = s.href?.match(/^\/collections\/(.+)$/)?.[1];
+        const col = slug ? collectionBySlug[slug] : null;
+        const image = col?.hasImage
+          ? getCollectionImageUrl({ id: col.id, width: 1600 })
+          : s.image ? getHeroSlideImageUrl(s.id, 1600) : '/images/collections/barbeque.jpg';
+        return { ...s, image };
+      })
     : DEFAULT_HERO_SLIDES;
 
   const goToSlide = useCallback((idx: number) => {

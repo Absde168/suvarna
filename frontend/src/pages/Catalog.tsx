@@ -19,13 +19,17 @@ export default function Catalog() {
   const initialCategory = params.get('category') || 'all';
   const initialCollection = params.get('collection') || '';
 
+  const initialFilter = params.get('filter') || '';
+
   const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [activeCollection, setActiveCollection] = useState(initialCollection);
+  const [activeFilter, setActiveFilter] = useState(initialFilter);
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     setActiveCategory(params.get('category') || 'all');
     setActiveCollection(params.get('collection') || '');
+    setActiveFilter(params.get('filter') || '');
   }, [search]);
 
   const { data: categoriesData } = useCategories();
@@ -35,13 +39,14 @@ export default function Catalog() {
     ...(activeCollection ? { collection: activeCollection } : {}),
   });
 
-  const products = productsData ?? [];
+  const allProducts = productsData ?? [];
+  const products = activeFilter === 'new' ? allProducts.filter(p => p.isNew) : allProducts;
 
   const productCategories = (categoriesData ?? []).filter(c => c.slug !== 'novinki');
   const categories = [{ id: 0, name: 'Все', slug: 'all', count: 0 }, ...productCategories];
   const collections = collectionsData ?? [];
 
-  const categoryName = activeCategory === 'novinki' ? 'Новинки' : (categories.find(c => c.slug === activeCategory)?.name || 'Все');
+  const categoryName = activeFilter === 'new' ? 'Новинки' : (categories.find(c => c.slug === activeCategory)?.name || 'Все');
   const collectionName = collections.find(c => c.slug === activeCollection)?.name;
 
   return (
@@ -67,13 +72,6 @@ export default function Catalog() {
             className="flex-1 text-center font-body text-[10px] font-500 tracking-[0.15em] uppercase px-4 py-2 transition-all duration-200"
           >
             Все
-          </button>
-          <button
-            onClick={() => { setActiveCategory('novinki'); setActiveCollection(''); }}
-            style={activeCategory === 'novinki' && !activeCollection ? { backgroundColor: '#FFFDF7', color: '#C17A5A', border: '1px solid #FFFDF7' } : { backgroundColor: 'transparent', color: 'rgba(255,253,247,0.7)', border: '1px solid rgba(255,253,247,0.3)' }}
-            className="flex-1 text-center font-body text-[10px] font-500 tracking-[0.15em] uppercase px-4 py-2 transition-all duration-200"
-          >
-            Новинки
           </button>
           {productCategories.map(cat => (
             <button

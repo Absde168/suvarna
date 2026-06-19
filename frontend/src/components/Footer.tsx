@@ -21,7 +21,7 @@ export default function Footer() {
   const catalogLinks = [
     { label: 'Все товары', href: '/catalog' },
     ...productCategories.map(c => ({ label: c.name, href: `/catalog?category=${c.slug}` })),
-    { label: 'Новинки', href: '/catalog?category=novinki' },
+    { label: 'Новинки', href: '/catalog?filter=new' },
   ];
   return (
     <footer className="mt-24" style={{ backgroundColor: 'rgba(0,0,0,0.22)', backdropFilter: 'blur(4px)', borderTop: '1px solid rgba(255,253,247,0.15)' }}>

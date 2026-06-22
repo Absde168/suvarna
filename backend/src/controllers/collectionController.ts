@@ -5,7 +5,7 @@ import { productListSelect } from "./productController.js";
 export async function getCollections(_req: Request, res: Response) {
   const collections = await prisma.collection.findMany({
     include: { _count: { select: { products: true } }, image: { select: { id: true } } },
-    orderBy: { id: 'asc' },
+    orderBy: { id: 'desc' },
   });
 
   res.json(

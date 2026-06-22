@@ -10,10 +10,11 @@ import { getCollections } from '@shared/api';
 import { getCollectionImageUrl } from '@shared/api';
 
 const DEFAULT_HERO_SLIDES = [
-  { id: 0, image: '', label: 'Коллекция', title: 'BAROQUE GARDEN', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections/baroque-garden', align: 'left' },
-  { id: 0, image: '', label: 'Коллекция', title: 'Nisha', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections/nisha', align: 'right' },
-  { id: 0, image: '', label: 'Коллекция', title: 'Tara', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections/tara', align: 'left' },
-  { id: 0, image: '', label: 'Коллекция', title: 'Tej', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections/tej', align: 'right' },
+  { id: 0, image: '', label: 'Коллекция', title: 'Destiny', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections/destiny', align: 'left' },
+  { id: 0, image: '', label: 'Коллекция', title: 'BAROQUE GARDEN', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections/baroque-garden', align: 'right' },
+  { id: 0, image: '', label: 'Коллекция', title: 'Nisha', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections/nisha', align: 'left' },
+  { id: 0, image: '', label: 'Коллекция', title: 'Tara', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections/tara', align: 'right' },
+  { id: 0, image: '', label: 'Коллекция', title: 'Tej', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections/tej', align: 'left' },
 ];
 
 const CATEGORY_CARDS = [
@@ -34,29 +35,22 @@ export default function Home() {
   const { data: apiSlides } = useQuery({ queryKey: ['hero-slides'], queryFn: getHeroSlides });
   const { data: collections } = useQuery({ queryKey: ['collections'], queryFn: getCollections });
 
-  const collectionBySlug = Object.fromEntries((collections ?? []).map(c => [c.slug, c]));
+  const aligns = ['left', 'right'] as const;
 
-  const baseSlides = apiSlides && apiSlides.length > 0
-    ? apiSlides.map(s => ({
-        id: s.id,
-        image: s.image ? getHeroSlideImageUrl(s.id, 1600) : '/images/collections/barbeque.jpg',
-        label: s.label ?? 'Коллекция',
-        title: s.title,
-        subtitle: s.subtitle ?? '',
-        cta: s.cta ?? 'Смотреть коллекцию',
-        href: s.href ?? '/',
-        align: s.align ?? 'left',
-      }))
+  const heroSlides = collections && collections.length > 0
+    ? collections
+        .filter(c => c.hasImage)
+        .map((c, i) => ({
+          id: c.id,
+          image: getCollectionImageUrl({ id: c.id, width: 1600 }),
+          label: 'Коллекция',
+          title: c.name.toUpperCase(),
+          subtitle: '',
+          cta: 'Смотреть коллекцию',
+          href: `/collections/${c.slug}`,
+          align: aligns[i % 2],
+        }))
     : DEFAULT_HERO_SLIDES;
-
-  const heroSlides = baseSlides.map(s => {
-    const slug = s.href?.match(/^\/collections\/(.+)$/)?.[1];
-    const col = slug ? collectionBySlug[slug] : null;
-    const image = col?.hasImage
-      ? getCollectionImageUrl({ id: col.id, width: 1600 })
-      : s.image;
-    return { ...s, image };
-  });
 
   const goToSlide = useCallback((idx: number) => {
     if (isTransitioning) return;

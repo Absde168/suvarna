@@ -17,13 +17,12 @@ const DEFAULT_HERO_SLIDES = [
 ];
 
 const CATEGORY_CARDS = [
-  { label: 'Платья', slug: 'platya', key: 'category-platya' },
   { label: 'Жакеты', slug: 'zhakety', key: 'category-zhakety' },
-  { label: 'Тренчи', slug: 'trenchi', key: 'category-trenchi' },
-  { label: 'Блузки', slug: 'bluzki', key: 'category-bluzki' },
-  { label: 'Штаны', slug: 'shtany', key: 'category-shtany' },
-  { label: 'Ветровки', slug: 'vetrovki', key: 'category-vetrovki' },
+  { label: 'Брюки', slug: 'bryuki', key: 'category-bryuki' },
   { label: 'Костюмы', slug: 'kostyumy', key: 'category-kostyumy' },
+  { label: 'Тренчи', slug: 'trenchi', key: 'category-trenchi' },
+  { label: 'Платья', slug: 'platya', key: 'category-platya' },
+  { label: 'Блузы', slug: 'bluzy', key: 'category-bluzy' },
 ];
 
 const LOOKBOOK_KEYS = ['lookbook-1', 'lookbook-2', 'lookbook-3', 'lookbook-4', 'lookbook-5', 'lookbook-6'];

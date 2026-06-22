@@ -10,10 +10,10 @@ import { getCollections } from '@shared/api';
 import { getCollectionImageUrl } from '@shared/api';
 
 const DEFAULT_HERO_SLIDES = [
-  { id: 0, image: '/images/collections/barbeque.jpg', label: 'Коллекция', title: 'BAROQUE GARDEN', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections/baroque-garden', align: 'left' },
-  { id: 0, image: '/images/collections/nisha.jpg', label: 'Коллекция', title: 'Nisha', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections/nisha', align: 'right' },
-  { id: 0, image: '/images/collections/tara.jpg', label: 'Коллекция', title: 'Tara', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections/tara', align: 'left' },
-  { id: 0, image: '/images/collections/tej.jpg', label: 'Коллекция', title: 'Tej', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections/tej', align: 'right' },
+  { id: 0, image: '', label: 'Коллекция', title: 'BAROQUE GARDEN', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections/baroque-garden', align: 'left' },
+  { id: 0, image: '', label: 'Коллекция', title: 'Nisha', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections/nisha', align: 'right' },
+  { id: 0, image: '', label: 'Коллекция', title: 'Tara', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections/tara', align: 'left' },
+  { id: 0, image: '', label: 'Коллекция', title: 'Tej', subtitle: '', cta: 'Смотреть коллекцию', href: '/collections/tej', align: 'right' },
 ];
 
 const CATEGORY_CARDS = [

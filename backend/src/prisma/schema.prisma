@@ -19,6 +19,7 @@ model Collection {
   name        String
   slug        String           @unique
   description String?
+  position    Int              @default(0)
   image       CollectionImage?
   products    Product[]
 }

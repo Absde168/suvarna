@@ -40,3 +40,7 @@ export async function setCollectionImage({ id, file }: SetCollectionImageRequest
 export async function deleteCollectionImage({ id }: DeleteCollectionImageRequest): Promise<void> {
   await api.delete(`/admin/collections/${id}/image`);
 }
+
+export async function reorderCollections({ order }: { order: number[] }): Promise<void> {
+  await api.put("/collections/reorder", { order });
+}

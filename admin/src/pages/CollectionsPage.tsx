@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ActionIcon, Button, FileButton, Group, Image, Modal, Stack, Table, Text, Textarea, TextInput, Title } from '@mantine/core'
-import { IconEdit, IconPlus, IconTrash, IconUpload } from '@tabler/icons-react'
+import { IconArrowDown, IconArrowUp, IconEdit, IconPlus, IconTrash, IconUpload } from '@tabler/icons-react'
 import { notifications } from '@mantine/notifications'
 import { modals } from '@mantine/modals'
 import type { Collection, CollectionInput } from '@shared/api'
@@ -12,6 +12,7 @@ import {
   useDeleteCollection,
   useSetCollectionImage,
   useDeleteCollectionImage,
+  useReorderCollections,
 } from '@/entities/collections'
 
 const EMPTY_FORM: CollectionInput = { name: '', slug: '', description: '' }
@@ -23,6 +24,18 @@ export default function CollectionsPage() {
   const deleteCollection = useDeleteCollection()
   const setCollectionImage = useSetCollectionImage()
   const deleteCollectionImage = useDeleteCollectionImage()
+  const reorderCollections = useReorderCollections()
+
+  const moveCollection = (index: number, direction: -1 | 1) => {
+    if (!collections) return
+    const target = index + direction
+    if (target < 0 || target >= collections.length) return
+    const order = collections.map(c => c.id)
+    const tmp = order[index]
+    order[index] = order[target]
+    order[target] = tmp
+    reorderCollections.mutate({ order })
+  }
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<Collection | null>(null)
@@ -128,15 +141,26 @@ export default function CollectionsPage() {
             <Table.Th>Название</Table.Th>
             <Table.Th>Slug</Table.Th>
             <Table.Th>Товаров</Table.Th>
+            <Table.Th style={{ width: 60 }}>Порядок</Table.Th>
             <Table.Th style={{ width: 100 }} />
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {(collections ?? []).map((collection) => (
+          {(collections ?? []).map((collection, index) => (
             <Table.Tr key={collection.id}>
               <Table.Td>{collection.name}</Table.Td>
               <Table.Td>{collection.slug}</Table.Td>
               <Table.Td>{collection.count}</Table.Td>
+              <Table.Td>
+                <Group gap={2}>
+                  <ActionIcon size="sm" variant="subtle" disabled={index === 0} onClick={() => moveCollection(index, -1)}>
+                    <IconArrowUp size={14} />
+                  </ActionIcon>
+                  <ActionIcon size="sm" variant="subtle" disabled={index === (collections?.length ?? 0) - 1} onClick={() => moveCollection(index, 1)}>
+                    <IconArrowDown size={14} />
+                  </ActionIcon>
+                </Group>
+              </Table.Td>
               <Table.Td>
                 <Group gap={4}>
                   <ActionIcon variant="subtle" onClick={() => handleEdit(collection)}>

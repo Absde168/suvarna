@@ -5,7 +5,7 @@ import { productListSelect } from "./productController.js";
 export async function getCollections(_req: Request, res: Response) {
   const collections = await prisma.collection.findMany({
     include: { _count: { select: { products: true } }, image: { select: { id: true } } },
-    orderBy: { id: 'desc' },
+    orderBy: [{ position: 'asc' }, { id: 'desc' }],
   });
 
   res.json(
@@ -14,10 +14,26 @@ export async function getCollections(_req: Request, res: Response) {
       name: c.name,
       slug: c.slug,
       description: c.description,
+      position: c.position,
       hasImage: !!c.image,
       count: c._count.products,
     }))
   );
+}
+
+export async function reorderCollections(req: Request, res: Response) {
+  const { order } = req.body as { order: number[] };
+  if (!Array.isArray(order)) {
+    return res.status(400).json({ error: "order must be an array of collection ids" });
+  }
+
+  await Promise.all(
+    order.map((id, index) =>
+      prisma.collection.update({ where: { id }, data: { position: index } })
+    )
+  );
+
+  res.json({ ok: true });
 }
 
 export async function getCollectionBySlug(req: Request, res: Response) {

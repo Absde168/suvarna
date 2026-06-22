@@ -24,13 +24,12 @@ const EMPTY_FORM = {
 }
 
 const CATEGORY_SLOTS = [
-  { key: 'category-platya', label: 'Платья' },
   { key: 'category-zhakety', label: 'Жакеты' },
-  { key: 'category-trenchi', label: 'Тренчи' },
-  { key: 'category-bluzki', label: 'Блузки' },
-  { key: 'category-shtany', label: 'Штаны' },
-  { key: 'category-vetrovki', label: 'Ветровки' },
+  { key: 'category-bryuki', label: 'Брюки' },
   { key: 'category-kostyumy', label: 'Костюмы' },
+  { key: 'category-trenchi', label: 'Тренчи' },
+  { key: 'category-platya', label: 'Платья' },
+  { key: 'category-bluzy', label: 'Блузы' },
 ]
 
 const LOOKBOOK_SLOTS = [1, 2, 3, 4, 5, 6].map(n => ({ key: `lookbook-${n}`, label: `Фото ${n}` }))

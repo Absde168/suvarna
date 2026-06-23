@@ -1,8 +1,10 @@
 import { useState } from 'react'
-import { Badge, Button, Group, Pagination, Stack, Table, Text, TextInput, Title } from '@mantine/core'
-import { IconAdjustments, IconSearch, IconSortAscending, IconSortDescending } from '@tabler/icons-react'
+import { ActionIcon, Badge, Button, Group, Pagination, Stack, Table, Text, TextInput, Title } from '@mantine/core'
+import { modals } from '@mantine/modals'
+import { notifications } from '@mantine/notifications'
+import { IconAdjustments, IconSearch, IconSortAscending, IconSortDescending, IconTrash } from '@tabler/icons-react'
 import type { GetOrdersRequest, Order } from '@shared/api'
-import { useOrders } from '@/entities/orders'
+import { useDeleteOrder, useOrders } from '@/entities/orders'
 import { OrderFilterModal, type OrderFilters } from './orders/OrderFilterModal'
 import { OrderDetailModal } from './orders/OrderDetailModal'
 
@@ -26,6 +28,8 @@ export default function OrdersPage() {
   const [filterModalOpen, setFilterModalOpen] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
 
+  const deleteOrder = useDeleteOrder()
+
   const { data, isLoading } = useOrders({
     page,
     pageSize: PAGE_SIZE,
@@ -44,6 +48,24 @@ export default function OrdersPage() {
       setSortBy(field)
       setSortDir('asc')
     }
+  }
+
+  const handleDelete = (order: Order) => {
+    modals.openConfirmModal({
+      title: 'Удаление заказа',
+      children: <Text size="sm">Удалить заказ №{order.id} ({order.firstName} {order.lastName})? Это действие нельзя отменить.</Text>,
+      labels: { confirm: 'Удалить', cancel: 'Отмена' },
+      confirmProps: { color: 'red' },
+      onConfirm: () => {
+        deleteOrder.mutate(
+          { id: order.id },
+          {
+            onSuccess: () => notifications.show({ color: 'green', message: 'Заказ удалён' }),
+            onError: () => notifications.show({ color: 'red', title: 'Ошибка', message: 'Не удалось удалить заказ' }),
+          }
+        )
+      },
+    })
   }
 
   const activeFiltersCount = filters.status ? 1 : 0
@@ -99,6 +121,7 @@ export default function OrdersPage() {
                 {sortBy === 'createdAt' && (sortDir === 'asc' ? <IconSortAscending size={14} /> : <IconSortDescending size={14} />)}
               </Group>
             </Table.Th>
+            <Table.Th />
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -116,12 +139,17 @@ export default function OrdersPage() {
                   <Badge color={statusInfo.color}>{statusInfo.label}</Badge>
                 </Table.Td>
                 <Table.Td>{new Date(order.createdAt).toLocaleString('ru-RU')}</Table.Td>
+                <Table.Td onClick={(e) => e.stopPropagation()}>
+                  <ActionIcon variant="subtle" color="red" onClick={() => handleDelete(order)}>
+                    <IconTrash size={16} />
+                  </ActionIcon>
+                </Table.Td>
               </Table.Tr>
             )
           })}
           {!isLoading && (data?.items.length ?? 0) === 0 && (
             <Table.Tr>
-              <Table.Td colSpan={6}>
+              <Table.Td colSpan={7}>
                 <Text ta="center" c="dimmed" py="md">
                   Заказы не найдены
                 </Text>

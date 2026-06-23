@@ -120,3 +120,17 @@ export async function updateAdminOrderStatus(req: Request, res: Response) {
     res.status(404).json({ error: "Заказ не найден" });
   }
 }
+
+export async function deleteAdminOrder(req: Request, res: Response) {
+  const id = Number(req.params.id);
+  if (Number.isNaN(id)) {
+    return res.status(400).json({ error: "Некорректный id" });
+  }
+
+  try {
+    await prisma.order.delete({ where: { id } });
+    res.status(204).end();
+  } catch {
+    res.status(404).json({ error: "Заказ не найден" });
+  }
+}

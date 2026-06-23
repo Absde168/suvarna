@@ -22,3 +22,7 @@ export async function updateOrderStatus({ id, status }: UpdateOrderStatusRequest
   const res = await api.patch<UpdateOrderStatusResponse>(`/admin/orders/${id}/status`, { status });
   return res.data;
 }
+
+export async function deleteOrder({ id }: { id: number }): Promise<void> {
+  await api.delete(`/admin/orders/${id}`);
+}

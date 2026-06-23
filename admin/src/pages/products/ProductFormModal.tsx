@@ -71,6 +71,12 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
   const [form, setForm] = useState<ProductInput>(EMPTY_FORM)
   const [colorsInput, setColorsInput] = useState('')
 
+  const cats = categories ?? []
+  const nameToId = Object.fromEntries(cats.map((c) => [c.name, c.id]))
+  const selectedCategoryNames = (form.categoryIds ?? [])
+    .map((id) => cats.find((c) => c.id === id)?.name)
+    .filter((n): n is string => Boolean(n))
+
   useEffect(() => {
     if (!opened) return
 
@@ -209,23 +215,14 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
             />
           </Grid.Col>
           <Grid.Col span={3}>
-            {(() => {
-              const cats = categories ?? []
-              const nameToId = Object.fromEntries(cats.map((c) => [c.name, c.id]))
-              const selectedNames = (form.categoryIds ?? [])
-                .map((id) => cats.find((c) => c.id === id)?.name)
-                .filter((n): n is string => Boolean(n))
-              return (
-                <MultiSelect
-                  label="Категория"
-                  data={cats.map((c) => c.name)}
-                  value={selectedNames}
-                  onChange={(names) =>
-                    setForm((f) => ({ ...f, categoryIds: names.map((n) => nameToId[n]).filter(Boolean) }))
-                  }
-                />
-              )
-            })()}
+            <MultiSelect
+              label="Категория"
+              data={cats.map((c) => c.name)}
+              value={selectedCategoryNames}
+              onChange={(names) =>
+                setForm((f) => ({ ...f, categoryIds: names.map((n) => nameToId[n]).filter(Boolean) }))
+              }
+            />
           </Grid.Col>
           <Grid.Col span={3}>
             <Select

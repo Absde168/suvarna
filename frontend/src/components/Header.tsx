@@ -175,8 +175,8 @@ export default function Header() {
             <a href="tel:+79114959475" className="font-body text-sm block mb-1" style={{ color: '#FFFDF7' }}>
               +7 (911) 495-94-75
             </a>
-            <a href="mailto:info@suvarna.ru" className="font-body text-sm block" style={{ color: '#FFFDF7' }}>
-              info@suvarna.ru
+            <a href="mailto:info@iamsuvarna.ru" className="font-body text-sm block" style={{ color: '#FFFDF7' }}>
+              info@iamsuvarna.ru
             </a>
           </div>
         </nav>

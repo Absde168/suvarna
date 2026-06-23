@@ -100,8 +100,8 @@ export default function Footer() {
               </div>
               <div>
                 <p className="font-body text-xs mb-0.5 uppercase tracking-wider" style={{ color: 'rgba(255,253,247,0.45)' }}>Email</p>
-                <a href="mailto:info@suvarna.ru" className="font-body text-sm transition-opacity hover:opacity-100" style={{ color: 'rgba(255,253,247,0.85)' }}>
-                  info@suvarna.ru
+                <a href="mailto:info@iamsuvarna.ru" className="font-body text-sm transition-opacity hover:opacity-100" style={{ color: 'rgba(255,253,247,0.85)' }}>
+                  info@iamsuvarna.ru
                 </a>
               </div>
               <div>

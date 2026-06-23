@@ -33,8 +33,8 @@ export default function Contacts() {
               </div>
               <div>
                 <p className="section-label text-cream-faint mb-2">Email</p>
-                <a href="mailto:info@suvarna.ru" className="font-display text-2xl font-light text-cream hover:opacity-70 transition-opacity">
-                  info@suvarna.ru
+                <a href="mailto:info@iamsuvarna.ru" className="font-display text-2xl font-light text-cream hover:opacity-70 transition-opacity">
+                  info@iamsuvarna.ru
                 </a>
               </div>
               <div>

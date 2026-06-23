@@ -165,7 +165,7 @@ export default function ProductsPage() {
               </Table.Td>
               <Table.Td>{product.name}</Table.Td>
               <Table.Td>{product.article}</Table.Td>
-              <Table.Td>{product.category?.name ?? '—'}</Table.Td>
+              <Table.Td>{product.categories?.map(c => c.name).join(', ') || '—'}</Table.Td>
               <Table.Td>{product.price.toLocaleString('ru-RU')} ₽</Table.Td>
               <Table.Td>{product.quantity}</Table.Td>
               <Table.Td>

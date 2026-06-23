@@ -214,6 +214,7 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
               data={(categories ?? []).map((c) => ({ value: String(c.id), label: c.name }))}
               value={(form.categoryIds ?? []).map(String)}
               onChange={(values) => setForm((f) => ({ ...f, categoryIds: values.map(Number) }))}
+              searchable
               clearable
             />
           </Grid.Col>

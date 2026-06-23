@@ -13,7 +13,7 @@ export default function Search() {
   const results = query.length >= 2
     ? (products ?? []).filter(p =>
         p.name.toLowerCase().includes(query.toLowerCase()) ||
-        (p.category?.name ?? '').toLowerCase().includes(query.toLowerCase()) ||
+        p.categories?.some(c => c.name.toLowerCase().includes(query.toLowerCase())) ||
         (p.description ?? '').toLowerCase().includes(query.toLowerCase())
       )
     : [];

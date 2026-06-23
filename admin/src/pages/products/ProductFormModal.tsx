@@ -46,7 +46,7 @@ const EMPTY_FORM: ProductInput = {
   isNew: false,
   isBestseller: false,
   inStock: true,
-  categoryId: null,
+  categoryIds: [],
   collectionId: null,
 }
 
@@ -88,7 +88,7 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
         isNew: initialProduct.isNew,
         isBestseller: initialProduct.isBestseller,
         inStock: initialProduct.inStock,
-        categoryId: initialProduct.category?.id ?? null,
+        categoryIds: initialProduct.categories?.map((c) => c.id) ?? [],
         collectionId: initialProduct.collection?.id ?? null,
       })
       setColorsInput(initialProduct.colors.join(', '))
@@ -209,11 +209,11 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
             />
           </Grid.Col>
           <Grid.Col span={3}>
-            <Select
+            <MultiSelect
               label="Категория"
               data={(categories ?? []).map((c) => ({ value: String(c.id), label: c.name }))}
-              value={form.categoryId != null ? String(form.categoryId) : null}
-              onChange={(value) => setForm((f) => ({ ...f, categoryId: value ? Number(value) : null }))}
+              value={(form.categoryIds ?? []).map(String)}
+              onChange={(values) => setForm((f) => ({ ...f, categoryIds: values.map(Number) }))}
               clearable
             />
           </Grid.Col>

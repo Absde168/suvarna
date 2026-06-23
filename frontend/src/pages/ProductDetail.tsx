@@ -28,7 +28,7 @@ export default function ProductDetail() {
   const [openAccordion, setOpenAccordion] = useState<string | null>('description');
 
   const { data: categoryProducts } = useProducts(
-    product?.category?.slug ? { category: product.category.slug } : {}
+    product?.categories?.[0]?.slug ? { category: product.categories[0].slug } : {}
   );
 
   if (isLoading) {
@@ -52,7 +52,7 @@ export default function ProductDetail() {
 
   // Размеры: только у брючных костюмов (категория «Костюмы») есть сетка XS–XL,
   // все остальные модели — единый размер One Size.
-  const displaySizes = product.category?.slug === 'kostyumy'
+  const displaySizes = product.categories?.some(c => c.slug === 'kostyumy')
     ? product.sizes.filter(s => s !== 'One Size')
     : ['One Size'];
   const singleSize = displaySizes.length === 1;
@@ -99,8 +99,8 @@ export default function ProductDetail() {
           <span>/</span>
           <Link href="/catalog"><span className="hover:opacity-100 transition-opacity">Каталог</span></Link>
           <span>/</span>
-          <Link href={`/catalog?category=${product.category?.slug ?? ''}`}>
-            <span className="hover:opacity-100 transition-opacity">{product.category?.name}</span>
+          <Link href={`/catalog?category=${product.categories?.[0]?.slug ?? ''}`}>
+            <span className="hover:opacity-100 transition-opacity">{product.categories?.[0]?.name}</span>
           </Link>
           <span>/</span>
           <span style={{ color: '#FFFDF7' }}>{product.name}</span>
@@ -155,7 +155,7 @@ export default function ProductDetail() {
               )}
             </div>
 
-            <p className="section-label mb-2">{product.category?.name}</p>
+            <p className="section-label mb-2">{product.categories?.map(c => c.name).join(', ')}</p>
             <h1 className="font-display text-3xl lg:text-4xl font-light mb-3 leading-tight" style={{ color: '#FFFDF7' }}>
               {product.name}
             </h1>

@@ -14,6 +14,7 @@ model Category {
   products Product[]
 }
 
+
 model Collection {
   id          Int              @id @default(autoincrement())
   name        String
@@ -47,8 +48,7 @@ model Product {
   isNew        Boolean     @default(false)
   isBestseller Boolean     @default(false)
   inStock      Boolean     @default(true)
-  categoryId   Int?
-  category     Category?   @relation(fields: [categoryId], references: [id])
+  categories   Category[]
   collectionId Int?
   collection   Collection? @relation(fields: [collectionId], references: [id])
   orderItems   OrderItem[]

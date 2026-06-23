@@ -30,7 +30,7 @@ export interface Product {
   isNew: boolean;
   isBestseller: boolean;
   inStock: boolean;
-  category: ProductCategory | null;
+  categories: ProductCategory[];
   collection: ProductCollection | null;
   images: ProductImage[];
   createdAt: string;
@@ -75,7 +75,7 @@ export interface ProductInput {
   isNew?: boolean;
   isBestseller?: boolean;
   inStock?: boolean;
-  categoryId?: number | null;
+  categoryIds?: number[];
   collectionId?: number | null;
 }
 

@@ -60,7 +60,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
 
         {/* Info */}
         <div className="pt-3 pb-1">
-          <p className="section-label mb-1">{product.category?.name}</p>
+          <p className="section-label mb-1">{product.categories?.[0]?.name}</p>
           <h3 className="font-body text-sm font-400 leading-tight mb-1.5 group-hover:opacity-70 transition-opacity"
             style={{ color: '#FFFDF7' }}>
             {product.name}

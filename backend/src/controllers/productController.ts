@@ -15,7 +15,7 @@ export const productListSelect = {
   isNew: true,
   isBestseller: true,
   inStock: true,
-  category: { select: { id: true, name: true, slug: true } },
+  categories: { select: { id: true, name: true, slug: true } },
   collection: { select: { id: true, name: true, slug: true } },
   images: {
     select: { id: true, position: true, mimeType: true },
@@ -27,7 +27,7 @@ export async function getProducts(req: Request, res: Response) {
   const { category, collection } = req.query;
 
   const where: Record<string, unknown> = {};
-  if (category) where.category = { slug: String(category) };
+  if (category) where.categories = { some: { slug: String(category) } };
   if (collection) where.collection = { slug: String(collection) };
 
   const products = await prisma.product.findMany({

@@ -16,7 +16,7 @@ const adminProductSelect = {
   isNew: true,
   isBestseller: true,
   inStock: true,
-  category: { select: { id: true, name: true, slug: true } },
+  categories: { select: { id: true, name: true, slug: true } },
   collection: { select: { id: true, name: true, slug: true } },
   images: {
     select: { id: true, position: true, mimeType: true },
@@ -56,7 +56,7 @@ export async function getAdminProducts(req: Request, res: Response) {
   }
 
   if (category) {
-    where.category = { slug: String(category) };
+    where.categories = { some: { slug: String(category) } };
   }
 
   if (inStock !== undefined) {
@@ -121,11 +121,11 @@ interface ProductInput {
   isNew?: boolean;
   isBestseller?: boolean;
   inStock?: boolean;
-  categoryId?: number | null;
+  categoryIds?: number[];
   collectionId?: number | null;
 }
 
-function buildProductData(body: ProductInput): Prisma.ProductUncheckedCreateInput {
+function buildBaseProductData(body: ProductInput) {
   return {
     name: body.name,
     article: body.article,
@@ -139,7 +139,6 @@ function buildProductData(body: ProductInput): Prisma.ProductUncheckedCreateInpu
     isNew: Boolean(body.isNew),
     isBestseller: Boolean(body.isBestseller),
     inStock: body.inStock ?? true,
-    categoryId: body.categoryId ?? null,
     collectionId: body.collectionId ?? null,
   };
 }
@@ -156,8 +155,12 @@ export async function createAdminProduct(req: Request, res: Response) {
     return res.status(409).json({ error: "Товар с таким артикулом уже существует" });
   }
 
+  const categoryIds = Array.isArray(body.categoryIds) ? body.categoryIds : [];
   const product = await prisma.product.create({
-    data: buildProductData(body),
+    data: {
+      ...buildBaseProductData(body),
+      categories: categoryIds.length ? { connect: categoryIds.map((id) => ({ id })) } : undefined,
+    },
     select: adminProductSelect,
   });
 
@@ -182,9 +185,13 @@ export async function updateAdminProduct(req: Request, res: Response) {
   }
 
   try {
+    const categoryIds = Array.isArray(body.categoryIds) ? body.categoryIds : [];
     const product = await prisma.product.update({
       where: { id },
-      data: buildProductData(body),
+      data: {
+        ...buildBaseProductData(body),
+        categories: { set: categoryIds.map((id) => ({ id })) },
+      },
       select: adminProductSelect,
     });
     res.json(product);

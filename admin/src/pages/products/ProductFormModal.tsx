@@ -209,14 +209,23 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
             />
           </Grid.Col>
           <Grid.Col span={3}>
-            <MultiSelect
-              label="Категория"
-              data={(categories ?? []).map((c) => ({ value: String(c.id), label: c.name }))}
-              value={(form.categoryIds ?? []).map(String)}
-              onChange={(values) => setForm((f) => ({ ...f, categoryIds: values.map(Number) }))}
-              searchable
-              clearable
-            />
+            {(() => {
+              const cats = categories ?? []
+              const nameToId = Object.fromEntries(cats.map((c) => [c.name, c.id]))
+              const selectedNames = (form.categoryIds ?? [])
+                .map((id) => cats.find((c) => c.id === id)?.name)
+                .filter((n): n is string => Boolean(n))
+              return (
+                <MultiSelect
+                  label="Категория"
+                  data={cats.map((c) => c.name)}
+                  value={selectedNames}
+                  onChange={(names) =>
+                    setForm((f) => ({ ...f, categoryIds: names.map((n) => nameToId[n]).filter(Boolean) }))
+                  }
+                />
+              )
+            })()}
           </Grid.Col>
           <Grid.Col span={3}>
             <Select

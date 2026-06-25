@@ -36,7 +36,7 @@ export default function About() {
         <div className="max-w-3xl mx-auto text-center">
           <p className="section-label text-cream-faint mb-6">О бренде</p>
           <h1 className="font-display text-5xl lg:text-7xl font-light text-cream leading-tight mb-6">
-            <span className="italic" style={{ color: 'rgba(255,253,247,0.55)' }}>Birds Only</span>{' '}For Paradise
+            For Paradise <span className="italic" style={{ color: 'rgba(255,253,247,0.55)' }}>Birds Only</span>
           </h1>
           <p className="font-display text-2xl lg:text-3xl font-light text-cream mb-10">
             Где-то между Европой и Индией есть точка, где встречаются две культуры моды. Сдержанность европейского кроя и буйство индийской вышивки. Тишина и яркость в одной вещи.

@@ -33,6 +33,7 @@ export interface Product {
   categories: ProductCategory[];
   collection: ProductCollection | null;
   images: ProductImage[];
+  position: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -45,7 +46,7 @@ export interface GetProductsRequest {
   inStock?: boolean;
   isNew?: boolean;
   isBestseller?: boolean;
-  sortBy?: "name" | "article" | "price" | "quantity" | "createdAt";
+  sortBy?: "name" | "article" | "price" | "quantity" | "createdAt" | "position";
   sortDir?: "asc" | "desc";
 }
 

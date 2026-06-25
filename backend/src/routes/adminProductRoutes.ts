@@ -7,6 +7,7 @@ import {
   createAdminProduct,
   updateAdminProduct,
   deleteAdminProduct,
+  reorderProducts,
   addProductImage,
   deleteProductImage,
   reorderProductImages,
@@ -22,6 +23,7 @@ const router = Router();
 router.use(requireAuth);
 
 router.get("/", getAdminProducts);
+router.put("/reorder", reorderProducts);
 router.get("/:id", getAdminProductById);
 router.post("/", createAdminProduct);
 router.put("/:id", updateAdminProduct);

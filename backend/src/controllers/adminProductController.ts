@@ -22,11 +22,12 @@ const adminProductSelect = {
     select: { id: true, position: true, mimeType: true },
     orderBy: { position: "asc" as const },
   },
+  position: true,
   createdAt: true,
   updatedAt: true,
 } as const;
 
-const SORTABLE_FIELDS = ["name", "article", "price", "quantity", "createdAt"] as const;
+const SORTABLE_FIELDS = ["name", "article", "price", "quantity", "createdAt", "position"] as const;
 type SortableField = (typeof SORTABLE_FIELDS)[number];
 
 export async function getAdminProducts(req: Request, res: Response) {
@@ -38,8 +39,8 @@ export async function getAdminProducts(req: Request, res: Response) {
     inStock,
     isNew,
     isBestseller,
-    sortBy = "createdAt",
-    sortDir = "desc",
+    sortBy = "position",
+    sortDir = "asc",
   } = req.query;
 
   const pageNum = Math.max(1, Number(page) || 1);
@@ -255,6 +256,21 @@ export async function deleteProductImage(req: Request, res: Response) {
   } catch {
     res.status(404).json({ error: "Изображение не найдено" });
   }
+}
+
+export async function reorderProducts(req: Request, res: Response) {
+  const { ids } = req.body as { ids: number[] };
+  if (!Array.isArray(ids) || ids.some((id) => typeof id !== "number")) {
+    return res.status(400).json({ error: "Некорректный формат данных" });
+  }
+
+  await prisma.$transaction(
+    ids.map((id, index) =>
+      prisma.product.update({ where: { id }, data: { position: index } })
+    )
+  );
+
+  res.status(204).end();
 }
 
 export async function reorderProductImages(req: Request, res: Response) {

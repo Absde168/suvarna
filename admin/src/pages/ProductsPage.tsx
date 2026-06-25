@@ -13,12 +13,12 @@ import {
   Title,
   rem,
 } from '@mantine/core'
-import { IconAdjustments, IconEdit, IconPlus, IconSearch, IconSortAscending, IconSortDescending, IconTrash } from '@tabler/icons-react'
+import { IconAdjustments, IconArrowDown, IconArrowUp, IconEdit, IconPlus, IconSearch, IconSortAscending, IconSortDescending, IconTrash } from '@tabler/icons-react'
 import { notifications } from '@mantine/notifications'
 import { modals } from '@mantine/modals'
 import { getImageUrl } from '@shared/api'
 import type { GetProductsRequest, Product } from '@shared/api'
-import { useDeleteProduct, useProducts } from '@/entities/products'
+import { useDeleteProduct, useProducts, useReorderProducts } from '@/entities/products'
 import { ProductFormModal } from './products/ProductFormModal'
 import { ProductFilterModal, type ProductFilters } from './products/ProductFilterModal'
 
@@ -27,8 +27,8 @@ const PAGE_SIZE = 10
 export default function ProductsPage() {
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
-  const [sortBy, setSortBy] = useState<NonNullable<GetProductsRequest['sortBy']>>('createdAt')
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
+  const [sortBy, setSortBy] = useState<NonNullable<GetProductsRequest['sortBy']>>('position')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
   const [filters, setFilters] = useState<ProductFilters>({ category: null, inStock: null, isNew: null, isBestseller: null })
 
   const [filterModalOpen, setFilterModalOpen] = useState(false)
@@ -36,6 +36,7 @@ export default function ProductsPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
 
   const deleteProduct = useDeleteProduct()
+  const reorderProducts = useReorderProducts()
 
   const { data, isLoading } = useProducts({
     page,
@@ -88,6 +89,17 @@ export default function ProductsPage() {
     })
   }
 
+  const handleMove = (index: number, direction: -1 | 1) => {
+    const items = data?.items ?? []
+    const target = index + direction
+    if (target < 0 || target >= items.length) return
+    const newOrder = items.map((p) => p.id)
+    const tmp = newOrder[index]
+    newOrder[index] = newOrder[target]
+    newOrder[target] = tmp
+    reorderProducts.mutate({ ids: newOrder })
+  }
+
   const activeFiltersCount = Object.values(filters).filter((v) => v !== null).length
 
   return (
@@ -123,6 +135,7 @@ export default function ProductsPage() {
       <Table striped highlightOnHover verticalSpacing="sm">
         <Table.Thead>
           <Table.Tr>
+            <Table.Th style={{ width: rem(48) }} />
             <Table.Th style={{ width: rem(60) }}>Фото</Table.Th>
             <Table.Th onClick={() => handleSort('name')} style={{ cursor: 'pointer' }}>
               <Group gap={4}>
@@ -154,8 +167,18 @@ export default function ProductsPage() {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {(data?.items ?? []).map((product) => (
+          {(data?.items ?? []).map((product, index) => (
             <Table.Tr key={product.id}>
+              <Table.Td>
+                <Group gap={2} wrap="nowrap">
+                  <ActionIcon size="xs" variant="subtle" disabled={index === 0} onClick={() => handleMove(index, -1)}>
+                    <IconArrowUp size={12} />
+                  </ActionIcon>
+                  <ActionIcon size="xs" variant="subtle" disabled={index === (data?.items.length ?? 0) - 1} onClick={() => handleMove(index, 1)}>
+                    <IconArrowDown size={12} />
+                  </ActionIcon>
+                </Group>
+              </Table.Td>
               <Table.Td>
                 {product.images[0] ? (
                   <Image src={getImageUrl({ id: product.images[0].id })} h={40} w={40} fit="cover" radius="sm" />
@@ -189,7 +212,7 @@ export default function ProductsPage() {
           ))}
           {!isLoading && (data?.items.length ?? 0) === 0 && (
             <Table.Tr>
-              <Table.Td colSpan={8}>
+              <Table.Td colSpan={9}>
                 <Text ta="center" c="dimmed" py="md">
                   Товары не найдены
                 </Text>

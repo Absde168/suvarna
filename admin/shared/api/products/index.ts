@@ -60,3 +60,7 @@ export async function reorderProductImages({
   const res = await api.put<ReorderProductImagesResponse>(`/admin/products/${productId}/images/reorder`, { order });
   return res.data;
 }
+
+export async function reorderProducts({ ids }: { ids: number[] }): Promise<void> {
+  await api.put("/admin/products/reorder", { ids });
+}

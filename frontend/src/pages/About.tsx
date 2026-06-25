@@ -35,11 +35,8 @@ export default function About() {
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
         <div className="max-w-3xl mx-auto text-center">
           <p className="section-label text-cream-faint mb-6">О бренде</p>
-          <h2 className="font-display italic text-5xl lg:text-7xl font-light mb-2" style={{ color: 'rgba(255,253,247,0.55)' }}>
-            Birds Only
-          </h2>
-          <h1 className="font-display text-6xl lg:text-8xl font-light text-cream leading-tight mb-6">
-            For Paradise
+          <h1 className="font-display text-5xl lg:text-7xl font-light text-cream leading-tight mb-6">
+            <span className="italic" style={{ color: 'rgba(255,253,247,0.55)' }}>Birds Only</span>{' '}For Paradise
           </h1>
           <p className="font-display text-2xl lg:text-3xl font-light text-cream mb-10">
             Где-то между Европой и Индией есть точка, где встречаются две культуры моды. Сдержанность европейского кроя и буйство индийской вышивки. Тишина и яркость в одной вещи.

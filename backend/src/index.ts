@@ -16,6 +16,7 @@ import authRoutes from "./routes/authRoutes.js";
 import adminProductRoutes from "./routes/adminProductRoutes.js";
 import adminOrderRoutes from "./routes/adminOrderRoutes.js";
 import adminCollectionRoutes from "./routes/adminCollectionRoutes.js";
+import adminCategoryRoutes from "./routes/adminCategoryRoutes.js";
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use("/api/admin/auth", authRoutes);
 app.use("/api/admin/products", adminProductRoutes);
 app.use("/api/admin/orders", adminOrderRoutes);
 app.use("/api/admin/collections", adminCollectionRoutes);
+app.use("/api/admin/categories", adminCategoryRoutes);
 app.use("/api/admin/hero-slides", adminHeroSlideRoutes);
 app.use("/api/page-images", pageImageRoutes);
 app.use("/api/admin/page-images", adminPageImageRoutes);

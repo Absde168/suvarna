@@ -12,6 +12,7 @@ import {
   setHeroSlideImage, deleteHeroSlideImage, getHeroSlideImageUrl,
 } from '@shared/api/heroSlides'
 import { getPageImageUrl, setPageImage, deletePageImage, listPageImages } from '@shared/api/pageImages'
+import { getCategories, createCategory, deleteCategory } from '@shared/api/categories'
 import type { HeroSlide } from '@shared/api/heroSlides/types'
 
 const EMPTY_FORM = {
@@ -22,15 +23,6 @@ const EMPTY_FORM = {
   href: '/collections',
   align: 'left',
 }
-
-const CATEGORY_SLOTS = [
-  { key: 'category-zhakety', label: 'Жакеты' },
-  { key: 'category-bryuki', label: 'Брюки' },
-  { key: 'category-kostyumy', label: 'Костюмы' },
-  { key: 'category-trenchi', label: 'Тренчи' },
-  { key: 'category-platya', label: 'Платья' },
-  { key: 'category-bluzy', label: 'Блузы' },
-]
 
 const LOOKBOOK_SLOTS = [1, 2, 3, 4, 5, 6].map(n => ({ key: `lookbook-${n}`, label: `Фото ${n}` }))
 
@@ -80,17 +72,90 @@ function ImageSlot({ slot, uploadedKeys }: { slot: { key: string; label: string 
   )
 }
 
+type Category = { id: number; name: string; slug: string; count: number }
+
+function CategorySlot({
+  category,
+  uploadedKeys,
+  onDelete,
+}: {
+  category: Category
+  uploadedKeys: string[]
+  onDelete: (id: number, count: number) => void
+}) {
+  const imageKey = 'category-' + category.slug
+  const qc = useQueryClient()
+  const hasImage = uploadedKeys.includes(imageKey)
+
+  const uploadMut = useMutation({
+    mutationFn: (file: File) => setPageImage(imageKey, file),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['page-images-list'] })
+      notifications.show({ title: category.name + ' обновлено', message: '', color: 'green' })
+    },
+  })
+
+  const deleteImgMut = useMutation({
+    mutationFn: () => deletePageImage(imageKey),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['page-images-list'] })
+      notifications.show({ title: 'Фото удалено', message: '', color: 'orange' })
+    },
+  })
+
+  return (
+    <Card withBorder padding="sm" radius="md">
+      <Group justify="space-between" mb={6}>
+        <Text size="xs" fw={600}>{category.name}</Text>
+        <ActionIcon
+          color="red"
+          variant="subtle"
+          size="xs"
+          onClick={() => onDelete(category.id, category.count)}
+          title="Удалить категорию"
+        >
+          <IconTrash size={10} />
+        </ActionIcon>
+      </Group>
+      {hasImage ? (
+        <div style={{ position: 'relative' }}>
+          <Image src={getPageImageUrl(imageKey)} height={120} radius="sm" fit="cover" mb={6} />
+          <ActionIcon color="red" variant="filled" size="xs" style={{ position: 'absolute', top: 4, right: 4 }} onClick={() => deleteImgMut.mutate()} loading={deleteImgMut.isPending}>
+            <IconTrash size={10} />
+          </ActionIcon>
+        </div>
+      ) : (
+        <div style={{ height: 120, background: '#f0f0f0', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 6 }}>
+          <IconPhoto size={28} color="#aaa" />
+        </div>
+      )}
+      <FileButton onChange={(file) => file && uploadMut.mutate(file)} accept="image/*">
+        {(props) => (
+          <Button {...props} variant="light" size="xs" fullWidth leftSection={<IconUpload size={12} />} loading={uploadMut.isPending}>
+            {hasImage ? 'Заменить' : 'Загрузить'}
+          </Button>
+        )}
+      </FileButton>
+    </Card>
+  )
+}
+
 
 export default function HomepagePage() {
   const qc = useQueryClient()
   const { data: slides = [], isLoading } = useQuery({ queryKey: ['admin-hero-slides'], queryFn: getHeroSlides })
   const { data: uploadedKeys = [] } = useQuery({ queryKey: ['page-images-list'], queryFn: listPageImages })
+  const { data: categories = [] } = useQuery({ queryKey: ['admin-categories'], queryFn: getCategories })
 
   const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false)
   const [editSlide, setEditSlide] = useState<HeroSlide | null>(null)
   const [form, setForm] = useState(EMPTY_FORM)
 
+  const [catModalOpened, { open: openCatModal, close: closeCatModal }] = useDisclosure(false)
+  const [newCatName, setNewCatName] = useState('')
+
   const invalidate = () => qc.invalidateQueries({ queryKey: ['admin-hero-slides'] })
+  const invalidateCats = () => qc.invalidateQueries({ queryKey: ['admin-categories'] })
 
   const createMut = useMutation({
     mutationFn: createHeroSlide,
@@ -121,6 +186,41 @@ export default function HomepagePage() {
     mutationFn: ({ id, position }: { id: number; position: number }) => updateHeroSlide(id, { position }),
     onSuccess: invalidate,
   })
+
+  const createCatMut = useMutation({
+    mutationFn: (name: string) => createCategory(name),
+    onSuccess: () => {
+      invalidateCats()
+      qc.invalidateQueries({ queryKey: ['categories'] })
+      closeCatModal()
+      setNewCatName('')
+      notifications.show({ title: 'Категория добавлена', message: '', color: 'green' })
+    },
+    onError: (err: any) => {
+      notifications.show({ title: 'Ошибка', message: err?.response?.data?.error ?? 'Не удалось создать категорию', color: 'red' })
+    },
+  })
+
+  const deleteCatMut = useMutation({
+    mutationFn: (id: number) => deleteCategory(id),
+    onSuccess: () => {
+      invalidateCats()
+      qc.invalidateQueries({ queryKey: ['categories'] })
+      notifications.show({ title: 'Категория удалена', message: '', color: 'orange' })
+    },
+    onError: (err: any) => {
+      notifications.show({ title: 'Ошибка', message: err?.response?.data?.error ?? 'Не удалось удалить категорию', color: 'red' })
+    },
+  })
+
+  const handleDeleteCategory = (id: number, count: number) => {
+    if (count > 0) {
+      notifications.show({ title: 'Нельзя удалить', message: `Категория используется в ${count} товарах`, color: 'red' })
+      return
+    }
+    if (!window.confirm('Удалить категорию?')) return
+    deleteCatMut.mutate(id)
+  }
 
   const openCreate = () => {
     setEditSlide(null)
@@ -155,7 +255,6 @@ export default function HomepagePage() {
 
   const sorted = [...slides].sort((a, b) => a.position - b.position)
 
-  // Brand story upload
   const brandUploadMut = useMutation({
     mutationFn: (file: File) => setPageImage('brand-story', file),
     onSuccess: () => {
@@ -229,11 +328,19 @@ export default function HomepagePage() {
       <Divider mb="xl" />
 
       {/* ===== CATEGORIES ===== */}
-      <Title order={3} mb="md">Каталог — фото категорий</Title>
-      <SimpleGrid cols={{ base: 2, sm: 3, md: 4, lg: 7 }} mb="xl">
-        {CATEGORY_SLOTS.map(slot => (
-          <ImageSlot key={slot.key} slot={slot} uploadedKeys={uploadedKeys} />
+      <Group justify="space-between" mb="md">
+        <Title order={3}>Каталог — категории</Title>
+        <Button leftSection={<IconPlus size={16} />} onClick={openCatModal} size="sm">
+          Добавить категорию
+        </Button>
+      </Group>
+      <SimpleGrid cols={{ base: 2, sm: 3, md: 4, lg: 6 }} mb="xl">
+        {categories.map(cat => (
+          <CategorySlot key={cat.id} category={cat} uploadedKeys={uploadedKeys} onDelete={handleDeleteCategory} />
         ))}
+        {categories.length === 0 && (
+          <Text c="dimmed" size="sm">Категорий нет. Нажмите «Добавить категорию».</Text>
+        )}
       </SimpleGrid>
 
       <Divider mb="xl" />
@@ -269,7 +376,7 @@ export default function HomepagePage() {
         ))}
       </SimpleGrid>
 
-      {/* ===== MODAL ===== */}
+      {/* ===== HERO SLIDE MODAL ===== */}
       <Modal opened={modalOpened} onClose={closeModal} title={editSlide ? 'Редактировать слайд' : 'Новый слайд'} size="md">
         <Stack>
           <TextInput label="Заголовок *" placeholder="Barbeque" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
@@ -282,6 +389,26 @@ export default function HomepagePage() {
             <Button variant="subtle" onClick={closeModal}>Отмена</Button>
             <Button onClick={handleSave} loading={createMut.isPending || updateMut.isPending}>
               {editSlide ? 'Сохранить' : 'Создать'}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+
+      {/* ===== ADD CATEGORY MODAL ===== */}
+      <Modal opened={catModalOpened} onClose={closeCatModal} title="Новая категория" size="sm">
+        <Stack>
+          <TextInput
+            label="Название *"
+            placeholder="Например: Юбки"
+            value={newCatName}
+            onChange={e => setNewCatName(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter' && newCatName.trim()) createCatMut.mutate(newCatName) }}
+            autoFocus
+          />
+          <Group justify="flex-end" mt="sm">
+            <Button variant="subtle" onClick={closeCatModal}>Отмена</Button>
+            <Button onClick={() => createCatMut.mutate(newCatName)} loading={createCatMut.isPending} disabled={!newCatName.trim()}>
+              Создать
             </Button>
           </Group>
         </Stack>

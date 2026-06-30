@@ -16,11 +16,11 @@ import {
   Textarea,
   TextInput,
 } from '@mantine/core'
-import { IconArrowLeft, IconArrowRight, IconTrash, IconUpload } from '@tabler/icons-react'
+import { IconArrowLeft, IconArrowRight, IconPlus, IconTrash, IconUpload } from '@tabler/icons-react'
 import { notifications } from '@mantine/notifications'
 import { getImageUrl } from '@shared/api'
 import type { Product, ProductInput } from '@shared/api'
-import { useCategories } from '@/entities/categories'
+import { useCategories, useCreateCategory } from '@/entities/categories'
 import { useCollections } from '@/entities/collections'
 import {
   useAddProductImage,
@@ -68,8 +68,11 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
   const { data: freshProduct } = useProduct({ id: initialProduct?.id ?? NaN })
   const product = initialProduct ? freshProduct ?? initialProduct : null
 
+  const createCategory = useCreateCategory()
   const [form, setForm] = useState<ProductInput>(EMPTY_FORM)
   const [colorsInput, setColorsInput] = useState('')
+  const [newCatInput, setNewCatInput] = useState('')
+  const [addingCat, setAddingCat] = useState(false)
 
   const cats = categories ?? []
   const nameToId = Object.fromEntries(cats.map((c) => [c.name, c.id]))
@@ -216,13 +219,53 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
           </Grid.Col>
           <Grid.Col span={3}>
             <MultiSelect
-              label="Категория"
+              label={
+                <Group gap={4}>
+                  Категория
+                  <ActionIcon size="xs" variant="subtle" onClick={() => setAddingCat((v) => !v)}>
+                    <IconPlus size={12} />
+                  </ActionIcon>
+                </Group>
+              }
               data={cats.map((c) => c.name)}
               value={selectedCategoryNames}
               onChange={(names) =>
                 setForm((f) => ({ ...f, categoryIds: names.map((n) => nameToId[n]).filter(Boolean) }))
               }
             />
+            {addingCat && (
+              <Group gap={4} mt={4}>
+                <TextInput
+                  size="xs"
+                  placeholder="Новая категория"
+                  value={newCatInput}
+                  onChange={(e) => setNewCatInput(e.currentTarget.value)}
+                  style={{ flex: 1 }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      const name = newCatInput.trim()
+                      if (!name) return
+                      createCategory.mutate(name, {
+                        onSuccess: () => { setNewCatInput(''); setAddingCat(false) },
+                      })
+                    }
+                  }}
+                />
+                <Button
+                  size="xs"
+                  loading={createCategory.isPending}
+                  onClick={() => {
+                    const name = newCatInput.trim()
+                    if (!name) return
+                    createCategory.mutate(name, {
+                      onSuccess: () => { setNewCatInput(''); setAddingCat(false) },
+                    })
+                  }}
+                >
+                  Добавить
+                </Button>
+              </Group>
+            )}
           </Grid.Col>
           <Grid.Col span={3}>
             <Select

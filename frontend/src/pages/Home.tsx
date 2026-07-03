@@ -4,6 +4,7 @@ import { ArrowRight, ChevronLeft, ChevronRight, Package, RotateCcw, ShieldCheck,
 import { useQuery } from '@tanstack/react-query';
 import ProductCard from '@/components/ProductCard';
 import { useProducts } from '@/entities/products';
+import { useCategories } from '@/entities/categories';
 import { getHeroSlides, getHeroSlideImageUrl } from '@shared/api/heroSlides';
 import { getPageImageUrl } from '@shared/api/pageImages';
 import { getCollections } from '@shared/api';
@@ -34,6 +35,11 @@ export default function Home() {
 
   const { data: apiSlides } = useQuery({ queryKey: ['hero-slides'], queryFn: getHeroSlides });
   const { data: collections } = useQuery({ queryKey: ['collections'], queryFn: getCollections });
+  const { data: apiCategories } = useCategories();
+
+  const categoryCards = apiCategories && apiCategories.length > 0
+    ? apiCategories.map((c) => ({ label: c.name, slug: c.slug, key: `category-${c.slug}` }))
+    : CATEGORY_CARDS;
 
   const aligns = ['left', 'right'] as const;
 
@@ -190,7 +196,7 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-          {CATEGORY_CARDS.map((cat, i) => (
+          {categoryCards.map((cat, i) => (
             <Link key={cat.slug} href={`/catalog?category=${cat.slug}`}>
               <div className="group cursor-pointer" style={{ animationDelay: `${i * 80}ms` }}>
                 <div className="relative overflow-hidden aspect-[3/4] mb-3" style={{ backgroundColor: 'rgba(0,0,0,0.15)' }}>

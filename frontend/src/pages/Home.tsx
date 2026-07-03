@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'wouter';
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, Package, RotateCcw, ShieldCheck, MessageSquare } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import ProductCard from '@/components/ProductCard';
 import { useProducts } from '@/entities/products';
@@ -320,14 +320,20 @@ export default function Home() {
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             {[
-              { icon: '🚚', title: 'Доставка по России', text: 'СДЭК, Почта России, курьер' },
-              { icon: '↩️', title: 'Возврат 14 дней', text: 'Без лишних вопросов' },
-              { icon: '💳', title: 'Безопасная оплата', text: 'Карты, СБП, наложенный платёж' },
-              { icon: '✉️', title: 'Поддержка', text: 'Ответим в течение часа' },
+              { Icon: Package, title: 'Доставка по России', text: 'СДЭК, Почта России, курьер' },
+              { Icon: RotateCcw, title: 'Возврат 14 дней', text: 'Без лишних вопросов' },
+              { Icon: ShieldCheck, title: 'Безопасная оплата', text: 'Карты, СБП, наложенный платёж' },
+              { Icon: MessageSquare, title: 'Поддержка', text: 'Ответим в течение часа' },
             ].map((item, i) => (
-              <div key={i} className="text-center">
-                <div className="text-2xl mb-2">{item.icon}</div>
-                <h3 className="font-body text-sm font-500 mb-1" style={{ color: '#FFFDF7' }}>{item.title}</h3>
+              <div key={i} className="text-center flex flex-col items-center pt-9 pb-9">
+                <div className="flex items-center justify-center mb-[22px]">
+                  <item.Icon
+                    className="w-10 h-10 lg:w-[46px] lg:h-[46px]"
+                    strokeWidth={1.8}
+                    style={{ color: '#F6EDE5', filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.1))' }}
+                  />
+                </div>
+                <h3 className="font-body text-sm font-500 mb-3" style={{ color: '#FFFDF7', letterSpacing: '0.3px' }}>{item.title}</h3>
                 <p className="font-body text-xs" style={{ color: 'rgba(255,253,247,0.65)' }}>{item.text}</p>
               </div>
             ))}

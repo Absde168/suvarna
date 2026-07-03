@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import type { Product } from '@shared/api';
+import { trackAddToCart } from '@/lib/analytics';
 
 export interface CartItem {
   product: Product;
@@ -27,6 +28,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const addItem = useCallback((product: Product, size: string, quantity = 1) => {
+    trackAddToCart({ id: product.id, name: product.name, price: product.price, quantity });
     setItems(prev => {
       const existing = prev.find(i => i.product.id === product.id && i.size === size);
       if (existing) {

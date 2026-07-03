@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useSearch } from 'wouter';
 import { Check, XCircle, Loader2 } from 'lucide-react';
 import { getOrderById } from '@shared/api';
+import { trackPurchase } from '@/lib/analytics';
 
 type Status = 'loading' | 'paid' | 'pending' | 'failed';
 
@@ -24,6 +25,7 @@ export default function PaymentReturn() {
         const order = await getOrderById({ id: orderId });
         const paymentStatus = order.payment?.status;
         if (paymentStatus === 'paid') {
+          trackPurchase({ orderId, value: order.totalPrice });
           setStatus('paid');
         } else if (paymentStatus === 'failed') {
           setStatus('failed');

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /checkout
+Disallow: /payment/
+Disallow: /search
+Disallow: /404
+
+Sitemap: https://iamsuvarna.ru/sitemap.xml

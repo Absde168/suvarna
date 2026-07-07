@@ -113,3 +113,7 @@ client/public/__manus__/version.json
 .project-config.json
 /images
 dataexel.xlsx
+# Секреты Долями (mTLS сертификат и ключ) — только на сервере
+secrets/
+*.pem
+*.key

@@ -18,6 +18,7 @@ import adminOrderRoutes from "./routes/adminOrderRoutes.js";
 import adminCollectionRoutes from "./routes/adminCollectionRoutes.js";
 import adminCategoryRoutes from "./routes/adminCategoryRoutes.js";
 import sitemapRoutes from "./routes/sitemapRoutes.js";
+import dolyameRoutes from "./routes/dolyameRoutes.js";
 
 const app = express();
 
@@ -46,6 +47,7 @@ app.use("/api/admin/hero-slides", adminHeroSlideRoutes);
 app.use("/api/page-images", pageImageRoutes);
 app.use("/api/admin/page-images", adminPageImageRoutes);
 app.use("/api/sitemap.xml", sitemapRoutes);
+app.use("/api/dolyame", dolyameRoutes);
 
 const port = process.env.PORT || 4000;
 

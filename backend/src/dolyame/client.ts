@@ -8,7 +8,7 @@
 import fs from "fs";
 import https from "https";
 
-const BASE_URL = (process.env.DOLYAME_BASE_URL || "https://partner-demo.dolyame.ru/v1").replace(/\/+$/, "");
+const BASE_URL = (process.env.DOLYAME_BASE_URL || "https://partner.dolyame.ru/v1").replace(/\/+$/, "");
 const LOGIN = process.env.DOLYAME_LOGIN || "";
 const PASSWORD = process.env.DOLYAME_PASSWORD || "";
 const CERT_PATH = process.env.DOLYAME_CERT_PATH || "/app/secrets/dolyame-cert.pem";
@@ -135,4 +135,53 @@ export async function createDolyameOrder(
 // Метод Info — статус заявки.
 export async function getDolyameOrder(dolyameOrderId: string): Promise<unknown> {
   return request("GET", `/orders/${encodeURIComponent(dolyameOrderId)}`);
+}
+
+// Метод Commit — подтверждение заявки (после отгрузки). Передаются те же
+// значения amount / prepaid_amount / items, что и при создании.
+export async function commitDolyameOrder(
+  dolyameOrderId: string,
+  params: { amount: number; prepaidAmount?: number; items: DolyameItem[] },
+): Promise<unknown> {
+  const body = {
+    amount: params.amount.toFixed(2),
+    prepaid_amount: (params.prepaidAmount ?? 0).toFixed(2),
+    items: params.items.map((it) => ({
+      name: it.name,
+      quantity: it.quantity,
+      price: it.price.toFixed(2),
+      receipt: {
+        tax: "none",
+        payment_method: "full_prepayment",
+        payment_object: "commodity",
+        measurement_unit: "шт",
+      },
+    })),
+  };
+  return request("POST", `/orders/${encodeURIComponent(dolyameOrderId)}/commit`, body);
+}
+
+// Метод Refund — возврат (полный или частичный). Для частичного передаём
+// возвращаемые позиции и сумму возврата.
+// TODO:confirm — точные названия полей (returned_items / amount) сверить на тесте.
+export async function refundDolyameOrder(
+  dolyameOrderId: string,
+  params: { amount: number; prepaidAmount?: number; returnedItems: DolyameItem[] },
+): Promise<unknown> {
+  const body = {
+    amount: params.amount.toFixed(2),
+    returned_items: params.returnedItems.map((it) => ({
+      name: it.name,
+      quantity: it.quantity,
+      price: it.price.toFixed(2),
+      receipt: {
+        tax: "none",
+        payment_method: "full_prepayment",
+        payment_object: "commodity",
+        measurement_unit: "шт",
+      },
+    })),
+    ...(params.prepaidAmount ? { prepaid_amount: params.prepaidAmount.toFixed(2) } : {}),
+  };
+  return request("POST", `/orders/${encodeURIComponent(dolyameOrderId)}/refund`, body);
 }

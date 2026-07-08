@@ -31,11 +31,14 @@ source "$CREDS"
 
 call() {
   local method="$1" path="$2" data="${3:-}"
+  local cid; cid="$(cat /proc/sys/kernel/random/uuid)"
   if [ -n "$data" ]; then
     curl -sS --cert "$CERT" --key "$KEY" -u "$LOGIN:$PASSWORD" \
-      -H "Content-Type: application/json" -X "$method" --data "$data" "$BASE$path"
+      -H "Content-Type: application/json" -H "X-Correlation-ID: $cid" \
+      -X "$method" --data "$data" "$BASE$path"
   else
-    curl -sS --cert "$CERT" --key "$KEY" -u "$LOGIN:$PASSWORD" -X "$method" "$BASE$path"
+    curl -sS --cert "$CERT" --key "$KEY" -u "$LOGIN:$PASSWORD" \
+      -H "X-Correlation-ID: $cid" -X "$method" "$BASE$path"
   fi
   echo
 }

@@ -7,6 +7,7 @@
 
 import fs from "fs";
 import https from "https";
+import { randomUUID } from "crypto";
 
 const BASE_URL = (process.env.DOLYAME_BASE_URL || "https://partner.dolyame.ru/v1").replace(/\/+$/, "");
 const LOGIN = process.env.DOLYAME_LOGIN || "";
@@ -48,6 +49,7 @@ function request<T>(method: string, path: string, body?: unknown): Promise<T> {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Basic ${auth}`,
+          "X-Correlation-ID": randomUUID(),
           ...(payload ? { "Content-Length": Buffer.byteLength(payload) } : {}),
         },
       },

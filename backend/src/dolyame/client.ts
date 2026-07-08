@@ -96,6 +96,15 @@ export interface CreateDolyameOrderResult {
   raw: unknown;
 }
 
+// «Долями» требует номер строго в формате +79991112233.
+// Приводим ввод с формы (+7 (999) 999-99-99, 8..., пробелы) к этому виду.
+function normalizePhone(raw: string): string {
+  let digits = raw.replace(/\D/g, "");
+  if (digits.length === 11 && digits.startsWith("8")) digits = "7" + digits.slice(1);
+  if (digits.length === 10) digits = "7" + digits;
+  return "+" + digits;
+}
+
 // Метод Create — создаёт заявку в «Долями» и возвращает ссылку для оплаты.
 export async function createDolyameOrder(
   params: CreateDolyameOrderParams,
@@ -121,7 +130,7 @@ export async function createDolyameOrder(
     client_info: {
       first_name: params.client.firstName,
       last_name: params.client.lastName,
-      phone: params.client.phone,
+      phone: normalizePhone(params.client.phone),
       email: params.client.email,
     },
     notification_url: `${APP_URL}/api/dolyame/notify`,

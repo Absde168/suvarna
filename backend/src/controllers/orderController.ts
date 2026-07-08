@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { prisma } from "../prisma.js";
 import { randomUUID } from "crypto";
+import { createDolyameOrder, dolyameConfigured } from "../dolyame/client.js";
 
 const YOKASSA_SHOP_ID = process.env.YOKASSA_SHOP_ID!;
 const YOKASSA_SECRET_KEY = process.env.YOKASSA_SECRET_KEY!;
@@ -122,9 +123,10 @@ export async function createOrder(req: Request, res: Response) {
 
   const products = await prisma.product.findMany({
     where: { id: { in: items.map((i: { productId: number }) => i.productId) } },
-    select: { id: true, price: true },
+    select: { id: true, price: true, name: true },
   });
   const priceByProductId = new Map(products.map((p) => [p.id, p.price]));
+  const nameByProductId = new Map(products.map((p) => [p.id, p.name]));
 
   for (const item of items) {
     if (!priceByProductId.has(item.productId)) {
@@ -179,6 +181,33 @@ export async function createOrder(req: Request, res: Response) {
       return res.status(201).json({ ...order, confirmationUrl });
     } catch (err) {
       console.error("ЮKасса payment creation failed:", err);
+      return res.status(201).json(order);
+    }
+  }
+
+  if (paymentMethod === "dolyame" && dolyameConfigured()) {
+    try {
+      // Позиции для «Долями»: товары + строка доставки, чтобы сумма позиций
+      // совпадала с amount (иначе API отклонит заявку).
+      const dolyameItems = items.map((item: { productId: number; quantity: number }) => ({
+        name: nameByProductId.get(item.productId) ?? `Товар ${item.productId}`,
+        quantity: item.quantity,
+        price: priceByProductId.get(item.productId)!,
+      }));
+      if (deliveryPrice > 0) {
+        dolyameItems.push({ name: "Доставка", quantity: 1, price: deliveryPrice });
+      }
+
+      const { link } = await createDolyameOrder({
+        orderId: order.id,
+        amount: totalPrice,
+        items: dolyameItems,
+        client: { firstName, lastName, phone, email },
+      });
+
+      return res.status(201).json({ ...order, confirmationUrl: link });
+    } catch (err) {
+      console.error("Долями order creation failed:", err);
       return res.status(201).json(order);
     }
   }

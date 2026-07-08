@@ -125,8 +125,8 @@ export async function createDolyameOrder(
       email: params.client.email,
     },
     notification_url: `${APP_URL}/api/dolyame/notify`,
-    fail_url: `${APP_URL}/payment/dolyame/fail?orderId=${params.orderId}`,
-    success_url: `${APP_URL}/payment/dolyame/success?orderId=${params.orderId}`,
+    fail_url: `${APP_URL}/payment/return?orderId=${params.orderId}`,
+    success_url: `${APP_URL}/payment/return?orderId=${params.orderId}`,
   };
 
   const data = await request<{ link?: string; url?: string }>("POST", "/orders/create", body);

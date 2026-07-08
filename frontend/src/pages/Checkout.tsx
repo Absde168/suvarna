@@ -27,7 +27,7 @@ interface FormData {
   apartment: string;
   comment: string;
   // Payment
-  paymentMethod: 'card' | 'sbp' | 'cod';
+  paymentMethod: 'card' | 'sbp' | 'cod' | 'dolyame';
   // Agreement
   agree: boolean;
 }
@@ -325,6 +325,7 @@ export default function Checkout() {
                   {[
                     { key: 'card', label: 'Банковская карта', desc: 'Visa, Mastercard, МИР — онлайн' },
                     { key: 'sbp', label: 'СБП (Система быстрых платежей)', desc: 'Оплата по QR-коду' },
+                    { key: 'dolyame', label: 'Долями', desc: 'Оплата частями на 6 недель, без переплат' },
                     { key: 'cod', label: 'Наложенный платёж', desc: 'Оплата при получении' },
                   ].map(opt => (
                     <label key={opt.key} className={`flex items-start gap-4 p-4 border cursor-pointer transition-all ${

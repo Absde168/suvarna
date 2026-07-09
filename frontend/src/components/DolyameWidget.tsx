@@ -93,8 +93,8 @@ export default function DolyameWidget({ price }: { price: number }) {
               href="https://dolyame.ru/"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-body text-sm underline"
-              style={{ color: '#1A1A1A' }}
+              className="block w-full text-center font-body text-sm font-600 py-3.5 rounded-xl transition-opacity hover:opacity-90"
+              style={{ background: '#1A1A1A', color: '#FFFFFF' }}
             >
               Подробнее на dolyame.ru
             </a>

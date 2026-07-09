@@ -16,13 +16,17 @@ function DolyameBars({ className = '' }: { className?: string }) {
 
 export default function DolyameWidget({ price }: { price: number }) {
   const [open, setOpen] = useState(false);
-  const perPayment = Math.round(price / 4);
+
+  // Точный расчёт: первый платёж забирает остаток от деления,
+  // чтобы сумма 4 платежей точно равнялась цене товара.
+  const base = Math.floor(price / 4);
+  const firstPayment = price - base * 3;
 
   const schedule = [
-    { label: 'Сегодня', value: perPayment },
-    { label: 'Через 2 недели', value: perPayment },
-    { label: 'Через 4 недели', value: perPayment },
-    { label: 'Через 6 недель', value: perPayment },
+    { label: 'Сегодня', value: firstPayment },
+    { label: 'Через 2 недели', value: base },
+    { label: 'Через 4 недели', value: base },
+    { label: 'Через 6 недель', value: base },
   ];
 
   return (
@@ -34,7 +38,7 @@ export default function DolyameWidget({ price }: { price: number }) {
         style={{ color: 'rgba(255,253,247,0.85)' }}
       >
         <DolyameBars />
-        <span>4 платежа по {formatPrice(perPayment)}</span>
+        <span>4 платежа по {formatPrice(base)}</span>
         <span className="underline" style={{ color: 'rgba(255,253,247,0.6)' }}>Подробнее</span>
       </button>
 
@@ -86,7 +90,7 @@ export default function DolyameWidget({ price }: { price: number }) {
             </p>
 
             <a
-              href="https://dolyame.ru"
+              href="https://dolyame.ru/"
               target="_blank"
               rel="noopener noreferrer"
               className="font-body text-sm underline"

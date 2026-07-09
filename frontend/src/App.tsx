@@ -74,7 +74,7 @@ function App() {
       <ThemeProvider defaultTheme="light">
         <CartProvider>
           <TooltipProvider>
-            <Toaster position="bottom-right" />
+            <Toaster position="top-right" />
             <ScrollToTop />
             <Router />
           </TooltipProvider>

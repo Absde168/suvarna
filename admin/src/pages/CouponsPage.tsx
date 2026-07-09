@@ -18,7 +18,8 @@ export default function CouponsPage() {
   const qc = useQueryClient()
   const { data: coupons } = useQuery({ queryKey: ['admin-coupons'], queryFn: getAdminCoupons })
   const { data: categories } = useQuery({ queryKey: ['categories'], queryFn: () => getCategories() })
-  const { data: products } = useQuery({ queryKey: ['products', {}], queryFn: () => getProducts({}) })
+  const { data: productsResp } = useQuery({ queryKey: ['products', { pageSize: 1000 }], queryFn: () => getProducts({ pageSize: 1000 }) })
+  const products = productsResp?.items
 
   const [code, setCode] = useState('')
   const [percent, setPercent] = useState<number | ''>(10)

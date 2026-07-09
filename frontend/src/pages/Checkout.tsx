@@ -10,6 +10,7 @@ import { useCart } from '@/contexts/CartContext';
 import { formatPrice } from '@/lib/utils';
 import { getImageUrl } from '@shared/api';
 import { useCreateOrder } from '@/entities/orders';
+import { validateCoupon } from '@shared/api/coupons';
 import { toast } from 'sonner';
 
 type Step = 'contacts' | 'delivery' | 'payment' | 'success';
@@ -48,6 +49,44 @@ export default function Checkout() {
     paymentMethod: 'card', agree: false,
   });
 
+  // Купон
+  const [couponInput, setCouponInput] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; percent: number; discount: number; itemsTotal: number } | null>(null);
+  const [couponError, setCouponError] = useState('');
+  const [couponLoading, setCouponLoading] = useState(false);
+
+  const applyCouponCode = async () => {
+    const code = couponInput.trim();
+    if (!code) return;
+    setCouponLoading(true);
+    setCouponError('');
+    try {
+      const res = await validateCoupon({
+        code,
+        items: items.map(i => ({ productId: i.product.id, quantity: i.quantity })),
+      });
+      if (res.valid) {
+        setAppliedCoupon({ code: res.code!, percent: res.percent!, discount: res.discount!, itemsTotal: res.itemsTotal! });
+      } else {
+        setAppliedCoupon(null);
+        setCouponError(res.error ?? 'Купон недействителен');
+      }
+    } catch {
+      setCouponError('Не удалось проверить купон');
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput('');
+    setCouponError('');
+  };
+
+  // Итоги с учётом скидки
+  const effectiveItemsTotal = appliedCoupon ? appliedCoupon.itemsTotal : totalPrice;
+
   const stepIndex = STEPS.findIndex(s => s.key === step);
 
   const update = (field: keyof FormData, value: string | boolean) => {
@@ -84,6 +123,7 @@ export default function Checkout() {
           apartment: form.apartment || undefined,
           comment: form.comment || undefined,
           paymentMethod: form.paymentMethod,
+          couponCode: appliedCoupon?.code,
           items: items.map(item => ({
             productId: item.product.id,
             size: item.size,
@@ -347,6 +387,38 @@ export default function Checkout() {
                   ))}
                 </div>
 
+                {/* Купон */}
+                <div className="mb-6">
+                  <label className="section-label text-cream-faint block mb-1.5">Промокод</label>
+                  {appliedCoupon ? (
+                    <div className="flex items-center justify-between border border-cream px-4 py-3">
+                      <span className="font-body text-sm text-cream">
+                        {appliedCoupon.code} — скидка {appliedCoupon.percent}% (−{formatPrice(appliedCoupon.discount)})
+                      </span>
+                      <button onClick={removeCoupon} className="font-body text-xs text-cream-faint underline hover:text-cream">
+                        Убрать
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={couponInput}
+                          onChange={e => { setCouponInput(e.target.value); setCouponError(''); }}
+                          onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); applyCouponCode(); } }}
+                          className="flex-1 border border-cream px-4 py-3 font-body text-sm text-cream bg-card-sienna focus:outline-none focus:border-cream transition-colors"
+                          placeholder="Введите промокод"
+                        />
+                        <button onClick={applyCouponCode} disabled={couponLoading} className="btn-outline whitespace-nowrap">
+                          {couponLoading ? '...' : 'Применить'}
+                        </button>
+                      </div>
+                      {couponError && <p className="font-body text-xs text-red-300 mt-1.5">{couponError}</p>}
+                    </>
+                  )}
+                </div>
+
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
                     type="checkbox"
@@ -427,6 +499,12 @@ export default function Checkout() {
                   <span className="font-body text-sm text-cream-muted">Товары</span>
                   <span className="font-body text-sm text-cream">{formatPrice(totalPrice)}</span>
                 </div>
+                {appliedCoupon && (
+                  <div className="flex justify-between">
+                    <span className="font-body text-sm text-cream-muted">Скидка ({appliedCoupon.code})</span>
+                    <span className="font-body text-sm text-cream">−{formatPrice(appliedCoupon.discount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="font-body text-sm text-cream-muted">Доставка</span>
                   <span className="font-body text-sm text-cream">
@@ -438,7 +516,7 @@ export default function Checkout() {
               <div className="flex justify-between">
                 <span className="font-body text-sm font-500 text-cream">Итого</span>
                 <span className="font-display text-xl font-light text-cream">
-                  {formatPrice(totalPrice + deliveryPrice)}
+                  {formatPrice(effectiveItemsTotal + deliveryPrice)}
                 </span>
               </div>
             </div>

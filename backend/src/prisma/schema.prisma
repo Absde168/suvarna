@@ -12,6 +12,19 @@ model Category {
   name     String
   slug     String    @unique
   products Product[]
+  coupons  Coupon[]
+}
+
+model Coupon {
+  id         Int       @id @default(autoincrement())
+  code       String    @unique
+  percent    Int       // процент скидки, напр. 20
+  productId  Int?      // купон на конкретный товар
+  product    Product?  @relation(fields: [productId], references: [id])
+  categoryId Int?      // купон на все товары категории
+  category   Category? @relation(fields: [categoryId], references: [id])
+  active     Boolean   @default(true)
+  createdAt  DateTime  @default(now())
 }
 
 
@@ -52,6 +65,7 @@ model Product {
   collectionId Int?
   collection   Collection? @relation(fields: [collectionId], references: [id])
   orderItems   OrderItem[]
+  coupons      Coupon[]
   position     Int         @default(0)
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt

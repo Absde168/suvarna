@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { prisma } from "../prisma.js";
 import { randomUUID } from "crypto";
 import { createDolyameOrder, dolyameConfigured } from "../dolyame/client.js";
+import { applyCoupon } from "../coupons/apply.js";
 
 const YOKASSA_SHOP_ID = process.env.YOKASSA_SHOP_ID!;
 const YOKASSA_SECRET_KEY = process.env.YOKASSA_SECRET_KEY!;
@@ -108,7 +109,7 @@ export async function createOrder(req: Request, res: Response) {
   const {
     firstName, lastName, phone, email,
     deliveryMethod, city, address, apartment, comment,
-    paymentMethod, items,
+    paymentMethod, items, couponCode,
   } = req.body;
 
   if (!firstName || !lastName || !phone || !email || !deliveryMethod || !paymentMethod) {
@@ -121,24 +122,19 @@ export async function createOrder(req: Request, res: Response) {
 
   const deliveryPrice = DELIVERY_PRICES[deliveryMethod] ?? 0;
 
-  const products = await prisma.product.findMany({
-    where: { id: { in: items.map((i: { productId: number }) => i.productId) } },
-    select: { id: true, price: true, name: true },
-  });
-  const priceByProductId = new Map(products.map((p) => [p.id, p.price]));
-  const nameByProductId = new Map(products.map((p) => [p.id, p.name]));
+  // Пересчёт цен со скидкой по купону (если указан). Всё считается на сервере.
+  const {
+    unitPriceByProductId, nameByProductId, itemsTotal,
+    missingProductId, error: couponError,
+  } = await applyCoupon(items, couponCode);
 
-  for (const item of items) {
-    if (!priceByProductId.has(item.productId)) {
-      return res.status(400).json({ error: `Товар ${item.productId} не найден` });
-    }
+  if (missingProductId != null) {
+    return res.status(400).json({ error: `Товар ${missingProductId} не найден` });
+  }
+  if (couponCode && couponError) {
+    return res.status(400).json({ error: couponError });
   }
 
-  const itemsTotal = items.reduce(
-    (sum: number, item: { productId: number; quantity: number }) =>
-      sum + priceByProductId.get(item.productId)! * item.quantity,
-    0
-  );
   const totalPrice = itemsTotal + deliveryPrice;
 
   const order = await prisma.order.create({
@@ -151,7 +147,7 @@ export async function createOrder(req: Request, res: Response) {
           productId: item.productId,
           size: item.size,
           quantity: item.quantity,
-          price: priceByProductId.get(item.productId)!,
+          price: unitPriceByProductId.get(item.productId)!,
         })),
       },
       payment: {
@@ -192,7 +188,7 @@ export async function createOrder(req: Request, res: Response) {
       const dolyameItems = items.map((item: { productId: number; quantity: number }) => ({
         name: nameByProductId.get(item.productId) ?? `Товар ${item.productId}`,
         quantity: item.quantity,
-        price: priceByProductId.get(item.productId)!,
+        price: unitPriceByProductId.get(item.productId)!,
       }));
       if (deliveryPrice > 0) {
         dolyameItems.push({ name: "Доставка", quantity: 1, price: deliveryPrice });

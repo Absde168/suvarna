@@ -20,6 +20,7 @@ import adminCategoryRoutes from "./routes/adminCategoryRoutes.js";
 import sitemapRoutes from "./routes/sitemapRoutes.js";
 import dolyameRoutes from "./routes/dolyameRoutes.js";
 import couponRoutes from "./routes/couponRoutes.js";
+import adminCouponRoutes from "./routes/adminCouponRoutes.js";
 
 const app = express();
 
@@ -50,6 +51,7 @@ app.use("/api/admin/page-images", adminPageImageRoutes);
 app.use("/api/sitemap.xml", sitemapRoutes);
 app.use("/api/dolyame", dolyameRoutes);
 app.use("/api/coupons", couponRoutes);
+app.use("/api/admin/coupons", adminCouponRoutes);
 
 const port = process.env.PORT || 4000;
 

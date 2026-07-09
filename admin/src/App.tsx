@@ -12,6 +12,7 @@ import ProductsPage from '@/pages/ProductsPage'
 import OrdersPage from '@/pages/OrdersPage'
 import CollectionsPage from '@/pages/CollectionsPage'
 import HomepagePage from '@/pages/HomepagePage'
+import CouponsPage from '@/pages/CouponsPage'
 
 const theme = createTheme({
   primaryColor: 'dark',
@@ -49,6 +50,7 @@ export default function App() {
                   <Route path="/collections" element={<CollectionsPage />} />
                   <Route path="/orders" element={<OrdersPage />} />
                   <Route path="/homepage" element={<HomepagePage />} />
+                  <Route path="/coupons" element={<CouponsPage />} />
                 </Route>
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>

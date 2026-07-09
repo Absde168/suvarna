@@ -12,6 +12,7 @@ import { useParams, Link } from 'wouter';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { getImageUrl } from '@shared/api';
 import { formatPrice } from '@/lib/utils';
+import DolyameWidget from '@/components/DolyameWidget';
 import { useProduct, useProducts } from '@/entities/products';
 import { useCart } from '@/contexts/CartContext';
 import ProductCard from '@/components/ProductCard';
@@ -159,9 +160,11 @@ export default function ProductDetail() {
             <h1 className="font-display text-3xl lg:text-4xl font-light mb-3 leading-tight" style={{ color: '#FFFDF7' }}>
               {product.name}
             </h1>
-            <p className="font-display text-3xl font-light mb-6" style={{ color: '#FFFDF7' }}>
+            <p className="font-display text-3xl font-light mb-3" style={{ color: '#FFFDF7' }}>
               {formatPrice(product.price)}
             </p>
+
+            <DolyameWidget price={product.price} />
 
             {/* Colors */}
             {product.colors && product.colors.length > 1 && (

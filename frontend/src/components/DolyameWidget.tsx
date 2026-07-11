@@ -121,7 +121,13 @@ export default function DolyameWidget({ price }: { price: number }) {
               target="_blank"
               rel="noopener noreferrer"
               className="relative block w-full text-center font-body text-sm font-500 tracking-[0.08em] uppercase py-3.5 rounded-2xl transition-all hover:opacity-90"
-              style={{ background: '#FFFDF7', color: '#C17A5A' }}
+              style={{
+                background: 'rgba(26,16,11,0.55)',
+                border: '1px solid rgba(255,253,247,0.35)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)',
+                color: '#FFFDF7',
+              }}
             >
               Подробнее на dolyame.ru
             </a>

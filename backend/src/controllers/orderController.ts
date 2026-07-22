@@ -112,7 +112,8 @@ export async function createOrder(req: Request, res: Response) {
     paymentMethod, items, couponCode,
   } = req.body;
 
-  if (!firstName || !lastName || !phone || !email || !deliveryMethod || !paymentMethod) {
+  // Фамилия необязательна (на форме без звёздочки) — не блокируем заказ из-за неё
+  if (!firstName || !phone || !email || !deliveryMethod || !paymentMethod) {
     return res.status(400).json({ error: "Заполните все обязательные поля" });
   }
 
@@ -139,7 +140,7 @@ export async function createOrder(req: Request, res: Response) {
 
   const order = await prisma.order.create({
     data: {
-      firstName, lastName, phone, email,
+      firstName, lastName: lastName ?? "", phone, email,
       deliveryMethod, city, address, apartment, comment,
       totalPrice,
       items: {

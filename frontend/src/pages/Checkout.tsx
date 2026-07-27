@@ -25,10 +25,9 @@ interface FormData {
   deliveryMethod: 'courier' | 'pickup' | 'cdek' | 'post';
   city: string;
   address: string;
-  apartment: string;
   comment: string;
   // Payment
-  paymentMethod: 'card' | 'sbp' | 'cod' | 'dolyame';
+  paymentMethod: 'card' | 'sbp' | 'dolyame';
   // Agreement
   agree: boolean;
 }
@@ -45,7 +44,7 @@ export default function Checkout() {
   const [step, setStep] = useState<Step>('contacts');
   const [form, setForm] = useState<FormData>({
     firstName: '', lastName: '', phone: '', email: '',
-    deliveryMethod: 'courier', city: '', address: '', apartment: '', comment: '',
+    deliveryMethod: 'courier', city: '', address: '', comment: '',
     paymentMethod: 'card', agree: false,
   });
 
@@ -120,7 +119,6 @@ export default function Checkout() {
           deliveryMethod: form.deliveryMethod,
           city: form.city || undefined,
           address: form.address || undefined,
-          apartment: form.apartment || undefined,
           comment: form.comment || undefined,
           paymentMethod: form.paymentMethod,
           couponCode: appliedCoupon?.code,
@@ -148,7 +146,14 @@ export default function Checkout() {
     }
   };
 
-  const deliveryPrice = form.deliveryMethod === 'pickup' ? 0 : form.deliveryMethod === 'courier' ? 500 : 350;
+  const deliveryPrice =
+    form.deliveryMethod === 'pickup'
+      ? 0
+      : form.deliveryMethod === 'courier'
+        ? 600
+        : form.deliveryMethod === 'cdek'
+          ? 700
+          : 500;
 
   if (items.length === 0 && step !== 'success') {
     return (
@@ -279,9 +284,9 @@ export default function Checkout() {
                 </h2>
                 <div className="space-y-3 mb-6">
                   {[
-                    { key: 'courier', label: 'Курьер (Москва и СПб)', price: 500, desc: '1–2 рабочих дня' },
-                    { key: 'cdek', label: 'СДЭК', price: 350, desc: '2–5 рабочих дней' },
-                    { key: 'post', label: 'Почта России', price: 350, desc: '5–10 рабочих дней' },
+                    { key: 'courier', label: 'Курьер (Москва)', price: 600, desc: '1–2 рабочих дня' },
+                    { key: 'cdek', label: 'СДЭК', price: 700, desc: '2–5 рабочих дней' },
+                    { key: 'post', label: 'Почта России', price: 500, desc: '5–10 рабочих дней' },
                     { key: 'pickup', label: 'Самовывоз', price: 0, desc: 'г. Москва, 2-й Павелецкий проезд, д. 5с1, БЦ RiverDale' },
                   ].map(opt => (
                     <label key={opt.key} className={`flex items-start gap-4 p-4 border cursor-pointer transition-all ${
@@ -327,17 +332,7 @@ export default function Checkout() {
                         value={form.address}
                         onChange={e => update('address', e.target.value)}
                         className="w-full border border-cream px-4 py-3 font-body text-sm text-cream bg-card-sienna focus:outline-none focus:border-cream transition-colors"
-                        placeholder="Улица, дом"
-                      />
-                    </div>
-                    <div>
-                      <label className="section-label text-cream-faint block mb-1.5">Квартира / офис</label>
-                      <input
-                        type="text"
-                        value={form.apartment}
-                        onChange={e => update('apartment', e.target.value)}
-                        className="w-full border border-cream px-4 py-3 font-body text-sm text-cream bg-card-sienna focus:outline-none focus:border-cream transition-colors"
-                        placeholder="Кв. 42"
+                        placeholder="Улица, дом, квартира"
                       />
                     </div>
                     <div>
@@ -366,7 +361,6 @@ export default function Checkout() {
                     { key: 'card', label: 'Банковская карта', desc: 'Visa, Mastercard, МИР — онлайн' },
                     { key: 'sbp', label: 'СБП (Система быстрых платежей)', desc: 'Оплата по QR-коду' },
                     { key: 'dolyame', label: 'Долями', desc: 'Оплата частями на 6 недель, без переплат' },
-                    { key: 'cod', label: 'Наложенный платёж', desc: 'Оплата при получении' },
                   ].map(opt => (
                     <label key={opt.key} className={`flex items-start gap-4 p-4 border cursor-pointer transition-all ${
                       form.paymentMethod === opt.key ? 'border-cream' : 'border-cream hover:border-cream'

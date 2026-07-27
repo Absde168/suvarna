@@ -9,13 +9,14 @@ const YOKASSA_SECRET_KEY = process.env.YOKASSA_SECRET_KEY!;
 const APP_URL = process.env.APP_URL || "https://iamsuvarna.ru";
 
 const DELIVERY_PRICES: Record<string, number> = {
-  courier: 500,
+  courier: 600,
   pickup: 0,
-  cdek: 350,
-  post: 350,
+  cdek: 700,
+  post: 500,
 };
 
 const ONLINE_METHODS = new Set(["card", "sbp"]);
+const PAYMENT_METHODS = new Set(["card", "sbp", "dolyame"]);
 
 const YOKASSA_METHOD_MAP: Record<string, string> = {
   card: "bank_card",
@@ -115,6 +116,9 @@ export async function createOrder(req: Request, res: Response) {
   // Фамилия необязательна (на форме без звёздочки) — не блокируем заказ из-за неё
   if (!firstName || !phone || !email || !deliveryMethod || !paymentMethod) {
     return res.status(400).json({ error: "Заполните все обязательные поля" });
+  }
+  if (!PAYMENT_METHODS.has(paymentMethod)) {
+    return res.status(400).json({ error: "Недоступный способ оплаты" });
   }
 
   if (!Array.isArray(items) || items.length === 0) {

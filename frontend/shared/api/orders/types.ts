@@ -1,5 +1,5 @@
 export type DeliveryMethod = "courier" | "pickup" | "cdek" | "post";
-export type PaymentMethod = "card" | "sbp" | "cod" | "dolyame";
+export type PaymentMethod = "card" | "sbp" | "dolyame";
 
 export interface OrderItemInput {
   productId: number;

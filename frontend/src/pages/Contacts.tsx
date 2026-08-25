@@ -47,7 +47,7 @@ export default function Contacts() {
                 <div className="flex gap-4">
                   {[
                     { label: 'Telegram', href: 'https://t.me/i_am_suvarna' },
-                    { label: 'ВКонтакте', href: 'https://vk.com/oza_fashion' },
+                    { label: 'ВКонтакте', href: 'https://vk.ru/iamsuvarna' },
                   ].map(s => (
                     <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" className="font-body text-sm text-cream border-b border-cream hover:border-[#111111] transition-colors pb-0.5">
                       {s.label}

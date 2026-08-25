@@ -41,7 +41,7 @@ export default function Footer() {
                 className="section-label transition-opacity hover:opacity-100" style={{ color: 'rgba(255,253,247,0.65)', opacity: 0.75 }}>
                 Telegram
               </a>
-              <a href="https://vk.com/oza_fashion" target="_blank" rel="noopener noreferrer"
+              <a href="https://vk.ru/iamsuvarna" target="_blank" rel="noopener noreferrer"
                 className="section-label transition-opacity hover:opacity-100" style={{ color: 'rgba(255,253,247,0.65)', opacity: 0.75 }}>
                 ВКонтакте
               </a>

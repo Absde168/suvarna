@@ -51,11 +51,9 @@ export default function ProductDetail() {
 
   const related = (categoryProducts ?? []).filter(p => p.id !== product.id).slice(0, 4);
 
-  // Размеры: только у брючных костюмов (категория «Костюмы») есть сетка XS–XL,
-  // все остальные модели — единый размер One Size.
-  const displaySizes = product.categories?.some(c => c.slug === 'kostyumy')
-    ? product.sizes.filter(s => s !== 'One Size')
-    : ['One Size'];
+  // Показываем размеры, заданные для товара в админке.
+  // One Size используем только для старых товаров без выбранных размеров.
+  const displaySizes = product.sizes.length > 0 ? product.sizes : ['One Size'];
   const singleSize = displaySizes.length === 1;
   const effectiveSize = singleSize ? displaySizes[0] : selectedSize;
 

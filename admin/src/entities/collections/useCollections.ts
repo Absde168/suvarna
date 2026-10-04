@@ -6,5 +6,7 @@ export function useCollections() {
   return useQuery({
     queryKey: collectionKeys.all,
     queryFn: () => getAdminCollections(),
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
   });
 }

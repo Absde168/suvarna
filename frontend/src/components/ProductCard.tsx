@@ -33,6 +33,18 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
           )}
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+            {!product.inStock && product.availableOnRequest && (
+              <span className="font-body text-[9px] font-500 tracking-[0.15em] uppercase px-2 py-0.5"
+                style={{ backgroundColor: '#FFFDF7', color: '#C17A5A' }}>
+                Под заказ
+              </span>
+            )}
+            {!product.inStock && !product.availableOnRequest && (
+              <span className="font-body text-[9px] font-500 tracking-[0.15em] uppercase px-2 py-0.5"
+                style={{ backgroundColor: 'rgba(0,0,0,0.55)', color: '#FFFDF7' }}>
+                Нет в наличии
+              </span>
+            )}
             {product.isNew && (
               <span className="font-body text-[9px] font-500 tracking-[0.15em] uppercase px-2 py-0.5"
                 style={{ backgroundColor: '#FFFDF7', color: '#C17A5A' }}>

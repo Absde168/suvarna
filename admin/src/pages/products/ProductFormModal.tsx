@@ -46,6 +46,7 @@ const EMPTY_FORM: ProductInput = {
   isNew: false,
   isBestseller: false,
   inStock: true,
+  availableOnRequest: false,
   categoryIds: [],
   collectionId: null,
 }
@@ -97,6 +98,7 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
         isNew: initialProduct.isNew,
         isBestseller: initialProduct.isBestseller,
         inStock: initialProduct.inStock,
+        availableOnRequest: initialProduct.availableOnRequest,
         categoryIds: initialProduct.categories?.map((c) => c.id) ?? [],
         collectionId: initialProduct.collection?.id ?? null,
       })
@@ -351,6 +353,14 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
                 onChange={(e) => {
                   const checked = e.currentTarget.checked
                   setForm((f) => ({ ...f, inStock: checked }))
+                }}
+              />
+              <Checkbox
+                label="Можно заказать повторно"
+                checked={!!form.availableOnRequest}
+                onChange={(e) => {
+                  const checked = e.currentTarget.checked
+                  setForm((f) => ({ ...f, availableOnRequest: checked }))
                 }}
               />
             </Group>

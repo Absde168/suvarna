@@ -125,6 +125,15 @@ export async function createOrder(req: Request, res: Response) {
     return res.status(400).json({ error: "Корзина пуста" });
   }
 
+  const requestedProductIds = items.map((item: { productId: number }) => Number(item.productId));
+  const orderableProducts = await prisma.product.findMany({
+    where: { id: { in: requestedProductIds } },
+    select: { id: true, inStock: true, availableOnRequest: true },
+  });
+  if (orderableProducts.some((product) => !product.inStock && !product.availableOnRequest)) {
+    return res.status(409).json({ error: "Один или несколько товаров больше недоступны для заказа" });
+  }
+
   const deliveryPrice = DELIVERY_PRICES[deliveryMethod] ?? 0;
 
   // Пересчёт цен со скидкой по купону (если указан). Всё считается на сервере.

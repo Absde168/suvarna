@@ -56,6 +56,8 @@ export default function ProductDetail() {
   const displaySizes = product.sizes.length > 0 ? product.sizes : ['One Size'];
   const singleSize = displaySizes.length === 1;
   const effectiveSize = singleSize ? displaySizes[0] : selectedSize;
+  const isPreorder = !product.inStock && product.availableOnRequest;
+  const isUnavailable = !product.inStock && !product.availableOnRequest;
 
   const handleAddToCart = () => {
     if (!effectiveSize) {
@@ -162,7 +164,13 @@ export default function ProductDetail() {
               {formatPrice(product.price)}
             </p>
 
-            <DolyameWidget price={product.price} />
+            {isPreorder && (
+              <p className="font-body text-sm mb-5" style={{ color: 'rgba(255,253,247,0.85)' }}>
+                Можно заказать повторно. Срок изготовления уточнит менеджер после оформления заказа.
+              </p>
+            )}
+
+            {!isUnavailable && <DolyameWidget price={product.price} />}
 
             {/* Colors */}
             {product.colors && product.colors.length > 1 && (
@@ -205,9 +213,14 @@ export default function ProductDetail() {
             {/* Add to cart */}
             <button
               onClick={handleAddToCart}
-              className="btn-primary w-full mb-3"
+              disabled={isUnavailable}
+              className={`btn-primary w-full mb-3${isUnavailable ? ' opacity-50 cursor-not-allowed' : ''}`}
             >
-              {effectiveSize ? `Добавить в корзину — ${formatPrice(product.price)}` : 'Выберите размер'}
+              {isUnavailable
+                ? 'Нет в наличии'
+                : effectiveSize
+                  ? `${isPreorder ? 'Оформить предзаказ' : 'Добавить в корзину'} — ${formatPrice(product.price)}`
+                  : 'Выберите размер'}
             </button>
             <button className="btn-outline w-full mb-6">
               Заказать примерку

@@ -194,6 +194,7 @@ export default function ProductsPage() {
               <Table.Td>
                 <Group gap={4}>
                   {product.inStock ? <Badge color="green" size="sm">В наличии</Badge> : <Badge color="gray" size="sm">Нет в наличии</Badge>}
+                  {product.availableOnRequest && <Badge color="orange" size="sm">Под заказ</Badge>}
                   {product.isNew && <Badge color="blue" size="sm">Новинка</Badge>}
                   {product.isBestseller && <Badge color="yellow" size="sm">Хит</Badge>}
                 </Group>

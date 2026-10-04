@@ -16,6 +16,7 @@ const adminProductSelect = {
   isNew: true,
   isBestseller: true,
   inStock: true,
+  availableOnRequest: true,
   categories: { select: { id: true, name: true, slug: true } },
   collection: { select: { id: true, name: true, slug: true } },
   images: {
@@ -122,6 +123,7 @@ interface ProductInput {
   isNew?: boolean;
   isBestseller?: boolean;
   inStock?: boolean;
+  availableOnRequest?: boolean;
   categoryIds?: number[];
   collectionId?: number | null;
 }
@@ -140,6 +142,7 @@ function buildBaseProductData(body: ProductInput) {
     isNew: Boolean(body.isNew),
     isBestseller: Boolean(body.isBestseller),
     inStock: body.inStock ?? true,
+    availableOnRequest: Boolean(body.availableOnRequest),
     collectionId: body.collectionId ?? null,
   };
 }

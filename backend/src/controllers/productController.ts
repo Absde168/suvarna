@@ -15,6 +15,7 @@ export const productListSelect = {
   isNew: true,
   isBestseller: true,
   inStock: true,
+  availableOnRequest: true,
   categories: { select: { id: true, name: true, slug: true } },
   collection: { select: { id: true, name: true, slug: true } },
   images: {

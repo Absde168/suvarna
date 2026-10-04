@@ -61,6 +61,7 @@ model Product {
   isNew        Boolean     @default(false)
   isBestseller Boolean     @default(false)
   inStock      Boolean     @default(true)
+  availableOnRequest Boolean @default(false)
   categories   Category[]
   collectionId Int?
   collection   Collection? @relation(fields: [collectionId], references: [id])

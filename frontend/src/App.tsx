@@ -23,6 +23,7 @@ import Privacy from "./pages/Privacy";
 import Search from "./pages/Search";
 import Care from "./pages/Care";
 import PaymentReturn from "./pages/PaymentReturn";
+import { Seo } from "./components/Seo";
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -44,7 +45,11 @@ function Layout({ children }: { children: React.ReactNode }) {
 }
 
 function Router() {
+  const [location] = useLocation();
+
   return (
+    <>
+    <Seo path={location.split("?")[0]} />
     <Switch>
       <Route path="/" component={() => <Layout><Home /></Layout>} />
       <Route path="/catalog" component={() => <Layout><Catalog /></Layout>} />
@@ -65,6 +70,7 @@ function Router() {
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
+    </>
   );
 }
 

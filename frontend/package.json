@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
+    "build:ssr": "vite build --ssr src/entry-server.tsx --outDir dist-server",
     "preview": "vite preview --host",
     "check": "tsc --noEmit",
     "format": "prettier --write ."

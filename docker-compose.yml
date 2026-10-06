@@ -33,6 +33,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.web
+      target: caddy-web
       args:
         VITE_API_URL: ${VITE_API_URL}
     restart: unless-stopped
@@ -45,6 +46,21 @@ services:
     volumes:
       - caddy_data:/data
       - caddy_config:/config
+    depends_on:
+      - backend
+      - frontend
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      target: frontend-ssr
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+    restart: unless-stopped
+    environment:
+      INTERNAL_API_URL: http://backend:4000/api
+      PUBLIC_SITE_URL: https://${DOMAIN}
     depends_on:
       - backend
 

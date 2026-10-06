@@ -17,6 +17,7 @@ import { useProduct, useProducts } from '@/entities/products';
 import { useCart } from '@/contexts/CartContext';
 import ProductCard from '@/components/ProductCard';
 import { toast } from 'sonner';
+import { ProductStructuredData, Seo } from '@/components/Seo';
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
@@ -48,6 +49,33 @@ export default function ProductDetail() {
       </main>
     );
   }
+
+  const productTitle = `${product.name} — купить в интернет-магазине SUVARNA`;
+  const productDescription = product.description?.trim()
+    ? `${product.description.trim().slice(0, 145)}${product.description.trim().length > 145 ? '…' : ''}`
+    : `${product.name} — дизайнерская одежда SUVARNA. Цена: ${product.price.toLocaleString('ru-RU')} ₽.`;
+  const productImage = product.images[0] ? getImageUrl({ id: product.images[0].id }) : undefined;
+  const productStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    description: product.description || product.name,
+    sku: product.article,
+    image: productImage,
+    brand: { '@type': 'Brand', name: 'SUVARNA' },
+    category: product.categories.map((category) => category.name).join(', '),
+    offers: {
+      '@type': 'Offer',
+      url: `https://iamsuvarna.ru/product/${product.id}`,
+      priceCurrency: 'RUB',
+      price: product.price,
+      availability: product.inStock || product.availableOnRequest
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      itemCondition: 'https://schema.org/NewCondition',
+      seller: { '@type': 'Organization', name: 'SUVARNA' },
+    },
+  };
 
   const related = (categoryProducts ?? []).filter(p => p.id !== product.id).slice(0, 4);
 
@@ -92,6 +120,9 @@ export default function ProductDetail() {
   ];
 
   return (
+    <>
+    <Seo path={`/product/${product.id}`} title={productTitle} description={productDescription} />
+    <ProductStructuredData data={productStructuredData} />
     <main className="pt-20 lg:pt-24 min-h-screen">
       {/* Breadcrumb */}
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -272,5 +303,6 @@ export default function ProductDetail() {
         </section>
       )}
     </main>
+    </>
   );
 }

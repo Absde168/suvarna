@@ -99,7 +99,7 @@ export default function Home() {
             }`}
           >
             <img
-              src={s.image}
+              src={s.image || undefined}
               alt={s.title}
               className="w-full h-full object-cover object-top"
             />

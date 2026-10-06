@@ -9,6 +9,7 @@ COPY frontend/ ./
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
+RUN npm run build:ssr
 
 FROM node:20-alpine AS admin-build
 WORKDIR /app
@@ -19,7 +20,16 @@ ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
 
-FROM caddy:2-alpine
-COPY --from=frontend-build /app/dist /srv/frontend
+FROM caddy:2-alpine AS caddy-web
 COPY --from=admin-build /app/dist /srv/admin
 COPY Caddyfile /etc/caddy/Caddyfile
+
+FROM node:20-alpine AS frontend-ssr
+WORKDIR /app
+COPY frontend/package*.json ./
+RUN npm ci --omit=dev --legacy-peer-deps
+COPY --from=frontend-build /app/dist ./dist
+COPY --from=frontend-build /app/dist-server ./dist-server
+COPY frontend/server.mjs ./server.mjs
+EXPOSE 3000
+CMD ["node", "server.mjs"]

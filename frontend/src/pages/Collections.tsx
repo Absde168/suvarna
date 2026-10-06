@@ -8,6 +8,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useCollections, useCollection } from '@/entities/collections';
 import { getCollectionImageUrl } from '@shared/api';
 import ProductCard from '@/components/ProductCard';
+import { Seo } from '@/components/Seo';
 
 // Individual collection page
 function CollectionDetail({ slug }: { slug: string }) {
@@ -35,6 +36,12 @@ function CollectionDetail({ slug }: { slug: string }) {
   }
 
   return (
+    <>
+    <Seo
+      path={`/collections/${slug}`}
+      title={`${collection.name} — коллекция SUVARNA`}
+      description={collection.description || `Коллекция ${collection.name} от SUVARNA. Дизайнерская женская одежда с авторским стилем.`}
+    />
     <main className="pt-20 lg:pt-24 min-h-screen">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         <Link href="/collections">
@@ -70,6 +77,7 @@ function CollectionDetail({ slug }: { slug: string }) {
         )}
       </div>
     </main>
+    </>
   );
 }
 

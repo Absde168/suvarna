@@ -15,11 +15,9 @@ www.{$DOMAIN} {
 		reverse_proxy backend:4000
 	}
 
-	# Frontend SPA
+	# SSR frontend, including the built static assets served by its Node process
 	handle {
-		root * /srv/frontend
-		try_files {path} /index.html
-		file_server
+		reverse_proxy frontend:3000
 	}
 
 	encode gzip

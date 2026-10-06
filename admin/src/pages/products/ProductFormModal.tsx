@@ -59,7 +59,7 @@ interface ProductFormModalProps {
 
 export function ProductFormModal({ opened, onClose, product: initialProduct }: ProductFormModalProps) {
   const { data: categories } = useCategories()
-  const { data: collections } = useCollections()
+  const { data: collections, refetch: refetchCollections } = useCollections()
   const createProduct = useCreateProduct()
   const updateProduct = useUpdateProduct()
   const addImage = useAddProductImage()
@@ -275,6 +275,7 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
               data={(collections ?? []).map((c) => ({ value: String(c.id), label: c.name }))}
               value={form.collectionId != null ? String(form.collectionId) : null}
               onChange={(value) => setForm((f) => ({ ...f, collectionId: value ? Number(value) : null }))}
+              onDropdownOpen={() => { void refetchCollections() }}
               clearable
             />
           </Grid.Col>

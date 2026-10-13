@@ -131,13 +131,17 @@ export default function Checkout() {
         },
         {
           onSuccess: (order) => {
-            clearCart();
-            if (order.confirmationUrl) {
-              // Онлайн-оплата — редирект на ЮKассу
-              window.location.href = order.confirmationUrl;
-            } else {
-              setStep('success');
+            if (form.paymentMethod === 'dolyame' || form.paymentMethod === 'card' || form.paymentMethod === 'sbp') {
+              if (!order.confirmationUrl) {
+                toast.error('Не удалось получить ссылку на оплату. Корзина сохранена — попробуйте ещё раз или выберите другой способ оплаты.');
+                return;
+              }
+              clearCart();
+              window.location.assign(order.confirmationUrl);
+              return;
             }
+            clearCart();
+            setStep('success');
           },
           onError: (error) => {
             const message = isAxiosError<{ error?: string }>(error)

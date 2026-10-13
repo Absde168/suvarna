@@ -139,8 +139,20 @@ export async function createDolyameOrder(
   };
 
   const data = await request<{ link?: string; url?: string }>("POST", "/orders/create", body);
-  const link = data.link || data.url || "";
-  return { link, raw: data };
+  const link = data.link || data.url;
+  if (!link) {
+    throw new Error(`Долями не вернула ссылку на оплату (поля ответа: ${Object.keys(data).join(", ") || "нет"})`);
+  }
+  let paymentUrl: URL;
+  try {
+    paymentUrl = new URL(link);
+  } catch {
+    throw new Error("Долями вернула некорректную ссылку на оплату");
+  }
+  if (paymentUrl.protocol !== "https:") {
+    throw new Error("Долями вернула небезопасную ссылку на оплату");
+  }
+  return { link: paymentUrl.toString(), raw: data };
 }
 
 // Метод Info — статус заявки.

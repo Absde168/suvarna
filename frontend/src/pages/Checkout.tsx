@@ -12,6 +12,7 @@ import { getImageUrl } from '@shared/api';
 import { useCreateOrder } from '@/entities/orders';
 import { validateCoupon } from '@shared/api/coupons';
 import { toast } from 'sonner';
+import { isAxiosError } from 'axios';
 
 type Step = 'contacts' | 'delivery' | 'payment' | 'success';
 
@@ -138,8 +139,11 @@ export default function Checkout() {
               setStep('success');
             }
           },
-          onError: () => {
-            toast.error('Не удалось оформить заказ. Попробуйте ещё раз.');
+          onError: (error) => {
+            const message = isAxiosError<{ error?: string }>(error)
+              ? error.response?.data?.error
+              : undefined;
+            toast.error(message ?? 'Не удалось оформить заказ. Попробуйте ещё раз.');
           },
         }
       );
@@ -182,7 +186,7 @@ export default function Checkout() {
             Спасибо за покупку, {form.firstName}!
           </p>
           <p className="font-body text-sm text-cream-muted mb-6">
-            Подтверждение заказа отправлено на {form.email}. Мы свяжемся с вами в течение 1 часа.
+            Мы свяжемся с вами в течение 1 часа по указанным контактам.
           </p>
           <Link href="/">
             <span className="btn-primary">Вернуться на главную</span>

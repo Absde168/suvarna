@@ -3,6 +3,7 @@ import { prisma } from "../prisma.js";
 import { randomUUID } from "crypto";
 import { createDolyameOrder, dolyameConfigured } from "../dolyame/client.js";
 import { applyCoupon } from "../coupons/apply.js";
+import { sendOrderNotification } from "../mail/orderNotification.js";
 
 const YOKASSA_SHOP_ID = process.env.YOKASSA_SHOP_ID!;
 const YOKASSA_SECRET_KEY = process.env.YOKASSA_SECRET_KEY!;
@@ -22,6 +23,33 @@ const YOKASSA_METHOD_MAP: Record<string, string> = {
   card: "bank_card",
   sbp: "sbp",
 };
+
+function notifyShop(order: {
+  id: number;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  deliveryMethod: string;
+  city: string | null;
+  address: string | null;
+  apartment: string | null;
+  comment: string | null;
+  totalPrice: number;
+}, paymentMethod: string, items: Array<{ productId: number; size: string; quantity: number; price: number }>, names: Map<number, string>) {
+  void sendOrderNotification({
+    ...order,
+    paymentMethod,
+    items: items.map((item) => ({
+      name: names.get(item.productId) ?? `Товар ${item.productId}`,
+      size: item.size,
+      quantity: item.quantity,
+      price: item.price,
+    })),
+  }).catch((err) => {
+    console.error(`Order notification email failed for order ${order.id}:`, err instanceof Error ? err.message : "unknown error");
+  });
+}
 
 async function createYokassaPayment(params: {
   amount: number;
@@ -120,6 +148,9 @@ export async function createOrder(req: Request, res: Response) {
   if (!PAYMENT_METHODS.has(paymentMethod)) {
     return res.status(400).json({ error: "Недоступный способ оплаты" });
   }
+  if (paymentMethod === "dolyame" && !dolyameConfigured()) {
+    return res.status(503).json({ error: "Оплата «Долями» временно недоступна. Заказ не оформлен, попробуйте позже или выберите другой способ оплаты." });
+  }
 
   if (!Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ error: "Корзина пуста" });
@@ -188,14 +219,17 @@ export async function createOrder(req: Request, res: Response) {
         data: { providerId: yokassaId },
       });
 
+      notifyShop(order, paymentMethod, order.items, nameByProductId);
+
       return res.status(201).json({ ...order, confirmationUrl });
     } catch (err) {
       console.error("ЮKасса payment creation failed:", err);
-      return res.status(201).json(order);
+      await prisma.payment.update({ where: { orderId: order.id }, data: { status: "failed" } });
+      return res.status(502).json({ error: "Не удалось создать ссылку на оплату в ЮKассе. Платёж не создан, корзина сохранена — попробуйте ещё раз или выберите другой способ оплаты." });
     }
   }
 
-  if (paymentMethod === "dolyame" && dolyameConfigured()) {
+  if (paymentMethod === "dolyame") {
     try {
       // Позиции для «Долями»: товары + строка доставки, чтобы сумма позиций
       // совпадала с amount (иначе API отклонит заявку).
@@ -215,10 +249,13 @@ export async function createOrder(req: Request, res: Response) {
         client: { firstName, lastName, phone, email },
       });
 
+      notifyShop(order, paymentMethod, order.items, nameByProductId);
+
       return res.status(201).json({ ...order, confirmationUrl: link });
     } catch (err) {
       console.error("Долями order creation failed:", err);
-      return res.status(201).json(order);
+      await prisma.payment.update({ where: { orderId: order.id }, data: { status: "failed" } });
+      return res.status(502).json({ error: "Не удалось создать ссылку на оплату через «Долями». Платёж не создан, корзина сохранена — попробуйте ещё раз или выберите другой способ оплаты." });
     }
   }
 

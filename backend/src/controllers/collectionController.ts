@@ -23,14 +23,18 @@ export async function getCollections(_req: Request, res: Response) {
 
 export async function reorderCollections(req: Request, res: Response) {
   const { order } = req.body as { order: number[] };
-  if (!Array.isArray(order)) {
+  if (!Array.isArray(order) || order.some((id) => !Number.isInteger(id)) || new Set(order).size !== order.length) {
     return res.status(400).json({ error: "order must be an array of collection ids" });
   }
 
-  await Promise.all(
-    order.map((id, index) =>
-      prisma.collection.update({ where: { id }, data: { position: index } })
-    )
+  const collections = await prisma.collection.findMany({ select: { id: true } });
+  const currentIds = new Set(collections.map((collection) => collection.id));
+  if (order.length !== currentIds.size || order.some((id) => !currentIds.has(id))) {
+    return res.status(400).json({ error: "order must contain every collection id exactly once" });
+  }
+
+  await prisma.$transaction(
+    order.map((id, index) => prisma.collection.update({ where: { id }, data: { position: index } }))
   );
 
   res.json({ ok: true });

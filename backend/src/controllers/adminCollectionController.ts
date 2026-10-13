@@ -12,7 +12,7 @@ function slugify(name: string): string {
 export async function getAdminCollections(_req: Request, res: Response) {
   const collections = await prisma.collection.findMany({
     include: { _count: { select: { products: true } }, image: { select: { id: true } } },
-    orderBy: { id: "asc" },
+    orderBy: [{ position: "asc" }, { id: "desc" }],
   });
 
   res.json(
@@ -21,6 +21,7 @@ export async function getAdminCollections(_req: Request, res: Response) {
       name: c.name,
       slug: c.slug,
       description: c.description,
+      position: c.position,
       hasImage: !!c.image,
       count: c._count.products,
     }))
@@ -44,8 +45,14 @@ export async function createAdminCollection(req: Request, res: Response) {
     return res.status(409).json({ error: "Коллекция с таким slug уже существует" });
   }
 
+  const maxPosition = await prisma.collection.aggregate({ _max: { position: true } });
   const collection = await prisma.collection.create({
-    data: { name: name.trim(), slug: finalSlug, description: description?.trim() || null },
+    data: {
+      name: name.trim(),
+      slug: finalSlug,
+      description: description?.trim() || null,
+      position: (maxPosition._max.position ?? -1) + 1,
+    },
   });
 
   res.status(201).json({ ...collection, hasImage: false, count: 0 });
@@ -84,6 +91,7 @@ export async function updateAdminCollection(req: Request, res: Response) {
       name: collection.name,
       slug: collection.slug,
       description: collection.description,
+      position: collection.position,
       hasImage: !!collection.image,
       count: collection._count.products,
     });

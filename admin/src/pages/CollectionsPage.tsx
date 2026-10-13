@@ -27,14 +27,16 @@ export default function CollectionsPage() {
   const reorderCollections = useReorderCollections()
 
   const moveCollection = (index: number, direction: -1 | 1) => {
-    if (!collections) return
+    if (!collections || reorderCollections.isPending) return
     const target = index + direction
     if (target < 0 || target >= collections.length) return
     const order = collections.map(c => c.id)
     const tmp = order[index]
     order[index] = order[target]
     order[target] = tmp
-    reorderCollections.mutate({ order })
+    reorderCollections.mutate({ order }, {
+      onError: () => notifications.show({ color: 'red', title: 'Ошибка', message: 'Не удалось изменить порядок коллекций' }),
+    })
   }
 
   const [modalOpen, setModalOpen] = useState(false)
@@ -153,10 +155,10 @@ export default function CollectionsPage() {
               <Table.Td>{collection.count}</Table.Td>
               <Table.Td>
                 <Group gap={2}>
-                  <ActionIcon size="sm" variant="subtle" disabled={index === 0} onClick={() => moveCollection(index, -1)}>
+                  <ActionIcon size="sm" variant="subtle" disabled={index === 0 || reorderCollections.isPending} onClick={() => moveCollection(index, -1)}>
                     <IconArrowUp size={14} />
                   </ActionIcon>
-                  <ActionIcon size="sm" variant="subtle" disabled={index === (collections?.length ?? 0) - 1} onClick={() => moveCollection(index, 1)}>
+                  <ActionIcon size="sm" variant="subtle" disabled={index === (collections?.length ?? 0) - 1 || reorderCollections.isPending} onClick={() => moveCollection(index, 1)}>
                     <IconArrowDown size={14} />
                   </ActionIcon>
                 </Group>

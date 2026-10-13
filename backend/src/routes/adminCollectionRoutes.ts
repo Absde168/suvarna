@@ -9,6 +9,7 @@ import {
   setCollectionImage,
   deleteCollectionImage,
 } from "../controllers/adminCollectionController.js";
+import { reorderCollections } from "../controllers/collectionController.js";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -21,6 +22,7 @@ router.use(requireAuth);
 
 router.get("/", getAdminCollections);
 router.post("/", createAdminCollection);
+router.put("/reorder", reorderCollections);
 router.put("/:id", updateAdminCollection);
 router.delete("/:id", deleteAdminCollection);
 

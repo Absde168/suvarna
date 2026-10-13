@@ -3,6 +3,7 @@ export interface Collection {
   name: string;
   slug: string;
   description: string | null;
+  position: number;
   hasImage: boolean;
   count: number;
 }

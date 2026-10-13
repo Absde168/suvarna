@@ -42,5 +42,5 @@ export async function deleteCollectionImage({ id }: DeleteCollectionImageRequest
 }
 
 export async function reorderCollections({ order }: { order: number[] }): Promise<void> {
-  await api.put("/collections/reorder", { order });
+  await api.put("/admin/collections/reorder", { order });
 }

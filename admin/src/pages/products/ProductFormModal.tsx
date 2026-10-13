@@ -74,6 +74,15 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
   const [colorsInput, setColorsInput] = useState('')
   const [newCatInput, setNewCatInput] = useState('')
   const [addingCat, setAddingCat] = useState(false)
+  const [pendingImages, setPendingImages] = useState<File[]>([])
+  const [pendingImageUrls, setPendingImageUrls] = useState<string[]>([])
+  const [isUploadingPendingImages, setIsUploadingPendingImages] = useState(false)
+
+  useEffect(() => {
+    const urls = pendingImages.map((file) => URL.createObjectURL(file))
+    setPendingImageUrls(urls)
+    return () => urls.forEach((url) => URL.revokeObjectURL(url))
+  }, [pendingImages])
 
   const cats = categories ?? []
   const nameToId = Object.fromEntries(cats.map((c) => [c.name, c.id]))
@@ -85,6 +94,7 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
     if (!opened) return
 
     if (initialProduct) {
+      setPendingImages([])
       setForm({
         name: initialProduct.name,
         article: initialProduct.article,
@@ -104,15 +114,16 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
       })
       setColorsInput(initialProduct.colors.join(', '))
     } else {
+      setPendingImages([])
       setForm(EMPTY_FORM)
       setColorsInput('')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialProduct?.id, opened])
 
-  const isSaving = createProduct.isPending || updateProduct.isPending
+  const isSaving = createProduct.isPending || updateProduct.isPending || isUploadingPendingImages
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.name.trim() || !form.article.trim()) {
       notifications.show({ color: 'red', title: 'Ошибка', message: 'Заполните название и артикул' })
       return
@@ -127,27 +138,35 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
     }
 
     if (product) {
-      updateProduct.mutate(
-        { id: product.id, data },
-        {
-          onSuccess: () => {
-            notifications.show({ color: 'green', message: 'Товар обновлён' })
-            onClose()
-          },
-          onError: () => notifications.show({ color: 'red', title: 'Ошибка', message: 'Не удалось сохранить товар' }),
-        }
-      )
+      try {
+        await updateProduct.mutateAsync({ id: product.id, data })
+        notifications.show({ color: 'green', message: 'Товар обновлён' })
+        onClose()
+      } catch {
+        notifications.show({ color: 'red', title: 'Ошибка', message: 'Не удалось сохранить товар' })
+      }
     } else {
-      createProduct.mutate(
-        { data },
-        {
-          onSuccess: () => {
-            notifications.show({ color: 'green', message: 'Товар создан' })
+      try {
+        const createdProduct = await createProduct.mutateAsync({ data })
+        if (pendingImages.length) {
+          setIsUploadingPendingImages(true)
+          try {
+            for (const file of pendingImages) {
+              await addImage.mutateAsync({ productId: createdProduct.id, file })
+            }
+          } catch {
+            notifications.show({ color: 'orange', title: 'Товар создан', message: 'Не все изображения загрузились — добавьте оставшиеся при редактировании товара' })
             onClose()
-          },
-          onError: () => notifications.show({ color: 'red', title: 'Ошибка', message: 'Не удалось создать товар' }),
+            return
+          } finally {
+            setIsUploadingPendingImages(false)
+          }
         }
-      )
+        notifications.show({ color: 'green', message: 'Товар создан' })
+        onClose()
+      } catch {
+        notifications.show({ color: 'red', title: 'Ошибка', message: 'Не удалось создать товар' })
+      }
     }
   }
 
@@ -368,7 +387,7 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
           </Grid.Col>
         </Grid>
 
-        {product && (
+        {product ? (
           <Stack gap="xs">
             <Group justify="space-between">
               <span>Изображения</span>
@@ -403,6 +422,43 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
                 </Stack>
               ))}
             </SimpleGrid>
+          </Stack>
+        ) : (
+          <Stack gap="xs">
+            <Group justify="space-between">
+              <span>Изображения</span>
+              <FileButton
+                onChange={(files) => {
+                  if (files?.length) setPendingImages((current) => [...current, ...files])
+                }}
+                accept="image/*"
+                multiple
+              >
+                {(props) => (
+                  <Button leftSection={<IconUpload size={16} />} variant="light" size="xs" {...props}>
+                    Выбрать изображения
+                  </Button>
+                )}
+              </FileButton>
+            </Group>
+            {pendingImages.length > 0 && (
+              <SimpleGrid cols={4}>
+                {pendingImages.map((file, index) => (
+                  <Stack key={`${file.name}-${index}`} gap={4} align="center">
+                    <Image src={pendingImageUrls[index]} h={100} w="100%" fit="cover" radius="sm" />
+                    <ActionIcon
+                      size="sm"
+                      variant="subtle"
+                      color="red"
+                      aria-label={`Удалить ${file.name}`}
+                      onClick={() => setPendingImages((current) => current.filter((_, fileIndex) => fileIndex !== index))}
+                    >
+                      <IconTrash size={14} />
+                    </ActionIcon>
+                  </Stack>
+                ))}
+              </SimpleGrid>
+            )}
           </Stack>
         )}
 

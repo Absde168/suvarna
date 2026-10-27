@@ -18,6 +18,7 @@ import {
 } from '@mantine/core'
 import { IconArrowLeft, IconArrowRight, IconPlus, IconTrash, IconUpload } from '@tabler/icons-react'
 import { notifications } from '@mantine/notifications'
+import { isAxiosError } from 'axios'
 import { getImageUrl } from '@shared/api'
 import type { Product, ProductInput } from '@shared/api'
 import { useCategories, useCreateCategory } from '@/entities/categories'
@@ -164,8 +165,15 @@ export function ProductFormModal({ opened, onClose, product: initialProduct }: P
         }
         notifications.show({ color: 'green', message: 'Товар создан' })
         onClose()
-      } catch {
-        notifications.show({ color: 'red', title: 'Ошибка', message: 'Не удалось создать товар' })
+      } catch (error) {
+        const message = isAxiosError<{ error?: string }>(error)
+          ? error.response?.data?.error
+          : undefined
+        notifications.show({
+          color: 'red',
+          title: 'Ошибка',
+          message: message ?? 'Не удалось создать товар. Проверьте артикул и подключение к серверу.',
+        })
       }
     }
   }

@@ -154,21 +154,34 @@ export async function createAdminProduct(req: Request, res: Response) {
     return res.status(400).json({ error: "Заполните название, артикул и цену" });
   }
 
-  const existing = await prisma.product.findUnique({ where: { article: body.article } });
-  if (existing) {
-    return res.status(409).json({ error: "Товар с таким артикулом уже существует" });
+  try {
+    const existing = await prisma.product.findUnique({ where: { article: body.article } });
+    if (existing) {
+      return res.status(409).json({ error: "Товар с таким артикулом уже существует" });
+    }
+
+    const categoryIds = Array.isArray(body.categoryIds) ? body.categoryIds : [];
+    const product = await prisma.product.create({
+      data: {
+        ...buildBaseProductData(body),
+        categories: categoryIds.length ? { connect: categoryIds.map((id) => ({ id })) } : undefined,
+      },
+      select: adminProductSelect,
+    });
+
+    return res.status(201).json(product);
+  } catch (error) {
+    console.error("Admin product creation failed:", error);
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        return res.status(409).json({ error: "Товар с таким артикулом уже существует" });
+      }
+      if (error.code === "P2003" || error.code === "P2025") {
+        return res.status(400).json({ error: "Выбранная категория или коллекция уже недоступна. Обновите страницу и попробуйте ещё раз." });
+      }
+    }
+    return res.status(500).json({ error: "Не удалось сохранить товар из-за ошибки сервера. Попробуйте ещё раз." });
   }
-
-  const categoryIds = Array.isArray(body.categoryIds) ? body.categoryIds : [];
-  const product = await prisma.product.create({
-    data: {
-      ...buildBaseProductData(body),
-      categories: categoryIds.length ? { connect: categoryIds.map((id) => ({ id })) } : undefined,
-    },
-    select: adminProductSelect,
-  });
-
-  res.status(201).json(product);
 }
 
 export async function updateAdminProduct(req: Request, res: Response) {
